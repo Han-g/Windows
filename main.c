@@ -79,8 +79,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static Object obj;
 	static Item item;
 
-	//kdhfaofsjkjfalj
-
 	switch (uMsg) {
 	case WM_CREATE:
 		SetTimer(hWnd, 1, 100, NULL);
