@@ -10,6 +10,20 @@
 #include <math.h>
 #include "resource.h"
 
+typedef struct box {
+	int left, right, top, bottom;
+} box;
+
+int collision(box A, box B);
+int collision(box A, box B)
+{
+	if (A.left < B.left && A.right > B.left && A.top < B.bottom && A.top >= B.top) return 1;
+	if (A.left < B.left && A.right > B.left && A.bottom > B.top && A.bottom <= B.bottom) return 1;
+	if (A.left > B.right && A.right < B.right && A.top < B.bottom && A.top >= B.top) return 1;
+	if (A.left > B.right && A.right < B.right && A.bottom > B.top && A.bottom <= B.bottom) return 1;
+	return 0;
+}
+
 int line_w = (window_size_w - 40) / 40, line_d = (window_size_d - 40) / 40, location = 0;
 
 HINSTANCE g_hInst;
