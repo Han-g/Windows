@@ -1,0 +1,4 @@
+﻿  main.c
+E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(58,26): warning C4133: '함수': 'box *'과(와) 'LPRECT' 사이의 형식이 호환되지 않습니다.
+E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(67,16): warning C4244: 'return': 'WPARAM'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Winpro_Proj.vcxproj -> E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\x64\Debug\Winpro_Proj.exe
