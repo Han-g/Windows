@@ -71,7 +71,7 @@ typedef struct CHARACTER {
 	int speed, num_bubble, bubble_len;
 }Character;
 typedef struct BUBBLE {
-	int x, y, len;
+	int x, y, len, time;
 }Bubble;
 typedef struct OBJECT {
 	int x, y;
@@ -87,9 +87,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	//HDC mem1dc, mem2dc;
 	static HBITMAP hBit1, hBit2;
 	//HBITMAP oldBit1, oldBit2;
-	static int reverse = 0, full = 0, sec = 0, trd = 0;
+	static int bubble_num = 0;
 	static int x = 0, y = 0, w = 330, h = 240, mx = 0, my = 0, mw = 1600, mh = 1200;
 	static Character character[2];
+	static Bubble* bubble;
 	static Object obj;
 	static Item item;
 
@@ -99,7 +100,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(101));
 		break;
 	case WM_TIMER:
-
+		for (int i = 0; i < bubble_num; i++)
+		{
+			bubble[i].time += 1;
+		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
 	case WM_KEYDOWN:
