@@ -75,7 +75,7 @@ typedef struct CHARACTER {
 	int speed, num_bubble, bubble_len;
 }Character;
 typedef struct BUBBLE {
-	int x, y, len, time, on, pop;
+	int x, y, len, time, on, pop, character;
 }Bubble;
 typedef struct OBJECT {
 	int x, y;
@@ -129,7 +129,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 				bubble[i].time = (bubble[i].time + 1);
 				if (bubble[i].time % 30 == 0) {
-				if (i < 6) count1 -= 1;
+				if (bubble[i].character == 1) count1 -= 1;
 				else count2 -= 1;
 				bubble[i].on = 0; bubble[i].pop = 1;
 				bubble[i].time = 0;
@@ -141,48 +141,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//collision
 		box CharA = { character[0].x, character[0].x + 1, character[0].y, character[0].y + 1 };
 		box CharB = { character[1].x, character[1].x + 1, character[1].y, character[1].y + 1 };
-		//box B_1 = { bubble[pop_bubble[0]].x + 0, bubble[pop_bubble[0]].x + 1, bubble[pop_bubble[0]].y + 0, bubble[pop_bubble[0]].y + 1 };
-		//box B_2 = { bubble[pop_bubble[0]].x + 1, bubble[pop_bubble[0]].x + 2, bubble[pop_bubble[0]].y + 0, bubble[pop_bubble[0]].y + 1 };
-		//box B_3 = { bubble[pop_bubble[0]].x - 1, bubble[pop_bubble[0]].x + 0, bubble[pop_bubble[0]].y + 0, bubble[pop_bubble[0]].y + 1 };
-		//box B_4 = { bubble[pop_bubble[0]].x + 0, bubble[pop_bubble[0]].x + 1, bubble[pop_bubble[0]].y + 1, bubble[pop_bubble[0]].y + 2 };
-		//box B_5 = { bubble[pop_bubble[0]].x + 0, bubble[pop_bubble[0]].x + 1, bubble[pop_bubble[0]].y - 1, bubble[pop_bubble[0]].y + 0 };
 		box B_1 = { 0,  };
 		box B_2 = { 0,  };
 		box B_3 = { 0,  };
 		box B_4 = { 0,  };
 		box B_5 = { 0,  };
-
-		//for (int j = 0; j < 7; j++) {
-		//	if (pop_bubble[j] != 0) {
-		//		B_1.left = bubble[pop_bubble[j]].x + 0; B_1.right = bubble[pop_bubble[j]].x + 1; B_1.top = bubble[pop_bubble[j]].y + 0; B_1.bottom = bubble[pop_bubble[j]].y + 1;
-		//		B_2.left = bubble[pop_bubble[j]].x + 1; B_2.right = bubble[pop_bubble[j]].x + 2; B_2.top = bubble[pop_bubble[j]].y + 0; B_2.bottom = bubble[pop_bubble[j]].y + 1;
-		//		B_3.left = bubble[pop_bubble[j]].x - 1; B_3.right = bubble[pop_bubble[j]].x + 0; B_3.top = bubble[pop_bubble[j]].y + 0; B_3.bottom = bubble[pop_bubble[j]].y + 1;
-		//		B_4.left = bubble[pop_bubble[j]].x + 0; B_4.right = bubble[pop_bubble[j]].x + 1; B_4.top = bubble[pop_bubble[j]].y + 1; B_4.bottom = bubble[pop_bubble[j]].y + 2;
-		//		B_5.left = bubble[pop_bubble[j]].x + 0; B_5.right = bubble[pop_bubble[j]].x + 1; B_5.top = bubble[pop_bubble[j]].y - 1; B_5.bottom = bubble[pop_bubble[j]].y + 0;
-
-		//		if (CharB.left == B_1.left && CharB.right == B_1.right && CharB.top == B_1.top && CharB.bottom == B_1.bottom) character[1].state = 1;
-		//		else if (CharB.left == B_2.left && CharB.right == B_2.right && CharB.top == B_2.top && CharB.bottom == B_2.bottom) character[1].state = 1;
-		//		else if (CharB.left == B_3.left && CharB.right == B_3.right && CharB.top == B_3.top && CharB.bottom == B_3.bottom) character[1].state = 1;
-		//		else if (CharB.left == B_4.left && CharB.right == B_4.right && CharB.top == B_4.top && CharB.bottom == B_4.bottom) character[1].state = 1;
-		//		else if (CharB.left == B_5.left && CharB.right == B_5.right && CharB.top == B_5.top && CharB.bottom == B_5.bottom) character[1].state = 1;
-		//	}
-		//}
-
-		//for (int j = 7; j < 14; j++) {
-		//	if (pop_bubble[j] != 0) {
-		//		B_1.left = bubble[pop_bubble[j]].x + 0; B_1.right = bubble[pop_bubble[j]].x + 1; B_1.top = bubble[pop_bubble[j]].y + 0; B_1.bottom = bubble[pop_bubble[j]].y + 1;
-		//		B_2.left = bubble[pop_bubble[j]].x + 1; B_2.right = bubble[pop_bubble[j]].x + 2; B_2.top = bubble[pop_bubble[j]].y + 0; B_2.bottom = bubble[pop_bubble[j]].y + 1;
-		//		B_3.left = bubble[pop_bubble[j]].x - 1; B_3.right = bubble[pop_bubble[j]].x + 0; B_3.top = bubble[pop_bubble[j]].y + 0; B_3.bottom = bubble[pop_bubble[j]].y + 1;
-		//		B_4.left = bubble[pop_bubble[j]].x + 0; B_4.right = bubble[pop_bubble[j]].x + 1; B_4.top = bubble[pop_bubble[j]].y + 1; B_4.bottom = bubble[pop_bubble[j]].y + 2;
-		//		B_5.left = bubble[pop_bubble[j]].x + 0; B_5.right = bubble[pop_bubble[j]].x + 1; B_5.top = bubble[pop_bubble[j]].y - 1; B_5.bottom = bubble[pop_bubble[j]].y + 0;
-
-		//		if (CharA.left == B_1.left && CharA.right == B_1.right && CharA.top == B_1.top && CharA.bottom == B_1.bottom) character[0].state = 1;
-		//		else if (CharA.left == B_2.left && CharA.right == B_2.right && CharA.top == B_2.top && CharA.bottom == B_2.bottom) character[0].state = 1;
-		//		else if (CharA.left == B_3.left && CharA.right == B_3.right && CharA.top == B_3.top && CharA.bottom == B_3.bottom) character[0].state = 1;
-		//		else if (CharA.left == B_4.left && CharA.right == B_4.right && CharA.top == B_4.top && CharA.bottom == B_4.bottom) character[0].state = 1;
-		//		else if (CharA.left == B_5.left && CharA.right == B_5.right && CharA.top == B_5.top && CharA.bottom == B_5.bottom) character[0].state = 1;
-		//	}
-		//}
 
 		for (int j = 0; j < 14; j++) {
 			if (pop_bubble[j] != 0) {
@@ -257,27 +220,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		//	}
 		//	break;
 		case VK_SHIFT:
+		//case 0x60:
 			if (bubble_num[0] > count1) {
 				//++bubble_num[0]; 
-				bubble[count1].x = character[0].x; bubble[count1].y = character[0].y;
-				bubble[count1].time = 0; bubble[count1].on = 1;
+				bubble[count1+count2].x = character[0].x; bubble[count1+count2].y = character[0].y;
+				bubble[count1 + count2].time = 0; bubble[count1 + count2].on = 1; bubble[count1 + count2].character = 1;
 				count1 = (count1 + 1) % (character[0].num_bubble+1);
 			}
 			break;
-		//case 0x60:
-		//	if (bubble_num[1] > count2) {
-		//		//++bubble_num[1]; 
-		//		bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
-		//		bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
-		//		count2 = (count2 + 1) % (character[1].num_bubble+1);
-		//	}
-		//	break;
 		case 'f':
 		case 'F':
 			if (bubble_num[1] > count2) {
 				//++bubble_num[1]; 
-				bubble[7 + count2].x = character[1].x; bubble[7 + count2].y = character[1].y;
-				bubble[7 + count2].time = 0; bubble[7 + count2].on = 1;
+				bubble[count1 + count2].x = character[1].x; bubble[count1 + count2].y = character[1].y;
+				bubble[count1 + count2].time = 0; bubble[count1 + count2].on = 1; bubble[count1 + count2].character = 2;
 				count2 = (count2 + 1) % (character[1].num_bubble + 1);
 			}
 			break;
