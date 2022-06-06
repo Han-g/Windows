@@ -55,8 +55,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdPa
 
 	RegisterClassEx(&WndClass);
 	box window = { 0,0,800,800 };
-	AdjustWindowRect(&window, WS_OVERLAPPEDWINDOW, FALSE);
-	hWnd = CreateWindow(lpszClass, lpszWindowName, CW_USEDEFAULT, 100, 100, window_size_w, window_size_d, NULL, (HMENU)NULL, hInstance, NULL);
+	//AdjustWindowRect(&window, WS_OVERLAPPEDWINDOW, FALSE);
+	hWnd = CreateWindow(lpszClass, lpszWindowName, WS_OVERLAPPEDWINDOW, 100, 100, window_size_w+20, window_size_d+40, NULL, (HMENU)NULL, hInstance, NULL);
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
 
@@ -78,7 +78,7 @@ typedef struct BUBBLE {
 	int x, y, len, time, on, pop;
 }Bubble;
 typedef struct OBJECT {
-	int x, y;
+	int x, y, kind;
 }Object;
 typedef struct ITEM {
 	int kind;
@@ -116,7 +116,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(101));
 		break;
 	case WM_TIMER:
-	{ int pop_bubble = 0; 
+	{ 
+		int pop_bubble = 0; 
 		for (int i = 0; i < 14; i++)
 		{
 			if (bubble[i].pop == 1) {
