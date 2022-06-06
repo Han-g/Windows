@@ -19,10 +19,14 @@ int map_kind = 1, fst_char_kind = 1, sec_char_kind = 1;
 int collision(box A, box B);
 int collision(box A, box B)
 {
-	if (A.left < B.left && A.right > B.left && A.top < B.bottom && A.top >= B.top) return 1;
-	if (A.left < B.left && A.right > B.left && A.bottom > B.top && A.bottom <= B.bottom) return 1;
-	if (A.left > B.right && A.right < B.right && A.top < B.bottom && A.top >= B.top) return 1;
-	if (A.left > B.right && A.right < B.right && A.bottom > B.top && A.bottom <= B.bottom) return 1;
+	if (A.left <= B.left && A.right > B.left && A.top < B.bottom && A.top >= B.top) 
+		return 1;
+	if (A.left <= B.left && A.right > B.left && A.bottom > B.top && A.bottom <= B.bottom) 
+		return 1;
+	if (A.left > B.right && A.right <= B.right && A.top < B.bottom && A.top >= B.top) 
+		return 1;
+	if (A.left > B.right && A.right <= B.right && A.bottom > B.top && A.bottom <= B.bottom) 
+		return 1;
 	return 0;
 }
 
@@ -239,26 +243,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (bubble[i].on == 1) {
 
 				bubble[i].time = (bubble[i].time + 1);
-				if (bubble[i].time % 30 == 0) {
+				if (bubble[i].time % 20 == 0) {
 				if (i < 6) count1 -= 1;
 				else count2 -= 1;
 				bubble[i].on = 0; bubble[i].pop = 1;
 				bubble[i].time = 0;
+				//collision
+				box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
+				box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
+				box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };
+				box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 2, bubble[pop_bubble].y + 1 };
+				box B_3 = { bubble[pop_bubble].x - 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };
+				box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 2 };
+				box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y - 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0 };
+
+				if (collision(CharA, B_1)==1 || collision(CharA, B_2)==1 || collision(CharA, B_3)==1 || collision(CharA, B_4)==1 || collision(CharA, B_5)==1)
+					character[0].state = 1;
+				if (collision(CharB, B_1)==1 || collision(CharB, B_2)==1 || collision(CharB, B_3)==1 || collision(CharB, B_4)==1 || collision(CharB, B_5)==1)
+					character[1].state = 1;
 				InvalidateRect(hWnd, NULL, TRUE);
 				}
 			}
 		}
 
-		//collision
-		box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
-		box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
-		box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };
-		box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 2, bubble[pop_bubble].y + 1 };
-		box B_3 = { bubble[pop_bubble].x - 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };
-		box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 2 };
-		box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y - 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0 };
-
-		if (collision(CharA, B_1) == 1) character[0].state = 1;
 		}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
@@ -360,31 +367,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			if (bubble[i].pop == 1)
 			{
-				Rectangle(hdc, (bubble[i].x) * 50, (bubble[i].y) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 1) * 50);
-				Rectangle(hdc, (bubble[i].x + 1) * 50, (bubble[i].y) * 50, (bubble[i].x + 2) * 50, (bubble[i].y + 1) * 50);
-				Rectangle(hdc, (bubble[i].x - 1) * 50, (bubble[i].y) * 50, (bubble[i].x) * 50, (bubble[i].y + 1) * 50);
-				Rectangle(hdc, (bubble[i].x) * 50, (bubble[i].y + 1) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 2) * 50);
-				Rectangle(hdc, (bubble[i].x) * 50, (bubble[i].y - 1) * 50, (bubble[i].x + 1) * 50, (bubble[i].y) * 50);
+				Rectangle(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 0) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 1) * 50);
+				Rectangle(hdc, (bubble[i].x + 1) * 50, (bubble[i].y + 0) * 50, (bubble[i].x + 2) * 50, (bubble[i].y + 1) * 50);
+				Rectangle(hdc, (bubble[i].x - 1) * 50, (bubble[i].y + 0) * 50, (bubble[i].x + 0) * 50, (bubble[i].y + 1) * 50);
+				Rectangle(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 1) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 2) * 50);
+				Rectangle(hdc, (bubble[i].x + 0) * 50, (bubble[i].y - 1) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 0) * 50);
 			}
 		}
 		for (int i = 0; i < bubble_num[1]; i++)
 		{
 			if (bubble[6 + i].pop == 1)
 			{
-				Rectangle(hdc, (bubble[6 + i].x) * 50, (bubble[6 + i].y) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 1) * 50);
-				Rectangle(hdc, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y) * 50, (bubble[6 + i].x + 2) * 50, (bubble[6 + i].y + 1) * 50);
-				Rectangle(hdc, (bubble[6 + i].x - 1) * 50, (bubble[6 + i].y) * 50, (bubble[6 + i].x) * 50, (bubble[6 + i].y + 1) * 50);
-				Rectangle(hdc, (bubble[6 + i].x) * 50, (bubble[6 + i].y + 1) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 2) * 50);
-				Rectangle(hdc, (bubble[6 + i].x) * 50, (bubble[6 + i].y - 1) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y) * 50);
+				Rectangle(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 0) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 1) * 50);
+				Rectangle(hdc, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 0) * 50, (bubble[6 + i].x + 2) * 50, (bubble[6 + i].y + 1) * 50);
+				Rectangle(hdc, (bubble[6 + i].x - 1) * 50, (bubble[6 + i].y + 0) * 50, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50);
+				Rectangle(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 2) * 50);
+				Rectangle(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y - 1) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 0) * 50);
 			}
 		}
 
 		hBrush = CreateSolidBrush(RGB(255, 0, 0));
 		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-		Rectangle(hdc, character[0].x * 50, character[0].y * 50, (character[0].x + 1) * 50, (character[0].y + 1)* 50);
+		if (character[0].state == 0)
+			Rectangle(hdc, character[0].x * 50, character[0].y * 50, (character[0].x + 1) * 50, (character[0].y + 1)* 50);
 		hBrush = CreateSolidBrush(RGB(0, 255, 0));
-		oldBrush = (HBRUSH)SelectObject(hdc, hBrush); 
-		Rectangle(hdc, character[1].x * 50, character[1].y * 50, (character[1].x + 1) * 50, (character[1].y + 1) * 50);
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+		if (character[1].state == 0)
+			Rectangle(hdc, character[1].x * 50, character[1].y * 50, (character[1].x + 1) * 50, (character[1].y + 1) * 50);
+		hBrush = CreateSolidBrush(RGB(125, 125, 125));
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+		if (character[0].state == 1) {
+			Rectangle(hdc, character[0].x * 50, character[0].y * 50, (character[0].x + 1) * 50, (character[0].y + 1) * 50);
+		}
+		if (character[1].state == 1) {
+			Rectangle(hdc, character[1].x * 50, character[1].y * 50, (character[1].x + 1) * 50, (character[1].y + 1) * 50);
+		}
 
 		DeleteDC(memdc);
 		EndPaint(hWnd, &ps);
