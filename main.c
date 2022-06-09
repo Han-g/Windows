@@ -2,13 +2,17 @@
 #define window_size_d 650
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "cImage.h"
+#include "cImageBlock.h"
+#include "cImageHouse.h"
+#include "resource.h"
+
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <ctype.h>
 #include <math.h>
-#include "resource.h"
 
 typedef struct box {
 	int left, top, right, bottom;
@@ -101,7 +105,7 @@ typedef struct OBJECT {
 	int x, y, kind;
 }Object;
 typedef struct ITEM {
-	int kind;
+	int x, y, kind;
 }Item;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -110,10 +114,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	HDC hdc, memdc;
 	//HDC mem1dc, mem2dc;
 	HBRUSH hBrush, oldBrush;
-	static HBITMAP hBit1, hBit2;
+	static HBITMAP hBit1, hBit2, hBit3;
 	//HBITMAP oldBit1, oldBit2;
-	static int bubble_num[2] = { 1,1 }, count1 = 0, count2 = 0;
-	static int x = 0, y = 0, w = 330, h = 240, mx = 0, my = 0, mw = 1600, mh = 1200;
+	static int bubble_num[2] = { 1,1 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0;
+	static int start_x[2], start_y[2];
 	static Character character[2];
 	static Bubble bubble[14];
 	static Object obj;
@@ -122,59 +126,74 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_CREATE:
 		DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, Dlalog_Proc);
+		//hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
+		//hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
+		hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
 
 		switch (map_kind)
 		{
 		case 1:		// camp08
-
+			start_x[0] = 1; start_y[0] = 1;
+			start_x[1] = 13; start_y[1] = 11;
 			break;
 		case 2:		// village10
-
+			start_x[0] = 1; start_y[0] = 1;
+			start_x[1] = 13; start_y[1] = 11;
 			break;
 		case 3:		// patrit14
-
+			start_x[0] = 1; start_y[0] = 1;
+			start_x[1] = 13; start_y[1] = 11;
 			break;
 		default:
 			break;
 		}
 
+		character[0].x = start_x[0]; character[0].y = start_y[0];
+		character[1].x = start_x[1]; character[1].y = start_y[1];
+
 		switch (fst_char_kind)
 		{
 		case 1:
 			// character setting
+			hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
 			character[0].num_bubble = 1;
 			character[0].speed = 1;
 			character[0].bubble_len = 1;
-			character[0].x = 14; character[0].y = 12;
 			character[0].kind = 1;
+			character[0].state = 0;
 			break;
 		case 2:
+			hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP12));
 			character[0].num_bubble = 1;
 			character[0].speed = 1;
 			character[0].bubble_len = 1;
-			character[0].x = 14; character[0].y = 12;
 			character[0].kind = 2;
+			character[0].state = 0;
 			break;
 		case 3:
+			hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP13));
 			character[0].num_bubble = 1;
 			character[0].speed = 1;
 			character[0].bubble_len = 1;
-			character[0].x = 14; character[0].y = 12;
 			character[0].kind = 3;
+			character[0].state = 0;
 			break;
 		case 4:
+			hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP14));
 			character[0].num_bubble = 1;
 			character[0].speed = 1;
 			character[0].bubble_len = 1;
-			character[0].x = 14; character[0].y = 12;
 			character[0].kind = 4;
+			character[0].state = 0;
 			break;
 		case 5:
+		{	int random = rand() % 4;
+			hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(113 + random));
 			character[0].num_bubble = 1;
 			character[0].speed = 1;
 			character[0].bubble_len = 1;
-			character[0].x = 14; character[0].y = 12;
 			character[0].kind = 5;
+			character[0].state = 0; }
 			break;
 		default:
 			break;
@@ -183,39 +202,45 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		switch (sec_char_kind)
 		{
 		case 1:
+			hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
 			character[1].num_bubble = 1;
 			character[1].speed = 1;
 			character[1].bubble_len = 1;
-			character[1].x = 0; character[1].y = 0;
 			character[1].kind = 1;
+			character[1].state = 0;
 			break;
 		case 2:
+			hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP12));
 			character[1].num_bubble = 1;
 			character[1].speed = 1;
 			character[1].bubble_len = 1;
-			character[1].x = 0; character[1].y = 0;
 			character[1].kind = 2;
+			character[1].state = 0;
 			break;
 		case 3:
+			hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP13));
 			character[1].num_bubble = 1;
 			character[1].speed = 1;
 			character[1].bubble_len = 1;
-			character[1].x = 0; character[1].y = 0;
 			character[1].kind = 3;
+			character[1].state = 0;
 			break;
 		case 4:
+			hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP14));
 			character[1].num_bubble = 1;
 			character[1].speed = 1;
 			character[1].bubble_len = 1;
-			character[1].x = 0; character[1].y = 0;
 			character[1].kind = 4;
+			character[1].state = 0;
 			break;
 		case 5:
+		{	int random = rand() % 4;
+			hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(113 + random));
 			character[1].num_bubble = 1;
 			character[1].speed = 1;
 			character[1].bubble_len = 1;
-			character[1].x = 0; character[1].y = 0;
 			character[1].kind = 5;
+			character[1].state = 0; }
 			break;
 		default:
 			break;
@@ -228,45 +253,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			bubble[i].on = 0; bubble[i].pop = 0;
 			bubble[i].time = 0;
 		}
-		hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(101));
 		break;
 	case WM_TIMER:
-	{ 
-		int pop_bubble = 0; 
+	{
+		int pop_bubble = 0;
+
 		for (int i = 0; i < 14; i++)
 		{
 			if (bubble[i].pop == 1) {
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
 				bubble[i].pop = 0;
 				pop_bubble = i;
 				InvalidateRect(hWnd, NULL, TRUE);
 			}
 			if (bubble[i].on == 1) {
-
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
 				bubble[i].time = (bubble[i].time + 1);
+				Bubble_move = (Bubble_move + 1) % 4;
 				if (bubble[i].time % 20 == 0) {
-				if (i < 6) count1 -= 1;
-				else count2 -= 1;
-				bubble[i].on = 0; bubble[i].pop = 1;
-				bubble[i].time = 0;
-				//collision
-				box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
-				box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
-				box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };
-				box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 2, bubble[pop_bubble].y + 1 };
-				box B_3 = { bubble[pop_bubble].x - 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };
-				box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 2 };
-				box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y - 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0 };
+					if (i < 6) count1 -= 1;
+					else count2 -= 1;
+					bubble[i].on = 0; bubble[i].pop = 1; bubble[i].time = 0;
 
-				if (collision(CharA, B_1)==1 || collision(CharA, B_2)==1 || collision(CharA, B_3)==1 || collision(CharA, B_4)==1 || collision(CharA, B_5)==1)
-					character[0].state = 1;
-				if (collision(CharB, B_1)==1 || collision(CharB, B_2)==1 || collision(CharB, B_3)==1 || collision(CharB, B_4)==1 || collision(CharB, B_5)==1)
-					character[1].state = 1;
-				InvalidateRect(hWnd, NULL, TRUE);
+					//collision
+					box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
+					box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
+					box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };
+					box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 2, bubble[pop_bubble].y + 1 };
+					box B_3 = { bubble[pop_bubble].x - 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };
+					box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 2 };
+					box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y - 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0 };
+
+					if (collision(CharA, B_1) == 1 || collision(CharA, B_2) == 1 || collision(CharA, B_3) == 1 || collision(CharA, B_4) == 1 || collision(CharA, B_5) == 1)
+						character[0].state = 1;
+					if (collision(CharB, B_1) == 1 || collision(CharB, B_2) == 1 || collision(CharB, B_3) == 1 || collision(CharB, B_4) == 1 || collision(CharB, B_5) == 1)
+						character[1].state = 1;
+					InvalidateRect(hWnd, NULL, TRUE);
 				}
 			}
 		}
-
-		}
+	}
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
 	case WM_KEYDOWN: // MOVE: wasd // BUBBLE: f  0
@@ -276,60 +302,69 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
 
 			{
-		case VK_LEFT:
-			if ((character[0].x) * 50 > 0 && (character[0].y != character[1].y || character[0].x - character[0].speed != character[1].x))
-			//if ((character[0].x) * 50 > 0 && !collision(CharA, CharB))-
-				character[0].x -= character[0].speed;
-			break;
-		case VK_RIGHT:
-			if ((character[0].x + 1) * 50 < window_size_w && (character[0].x + character[0].speed != character[1].x || character[0].y != character[1].y))
-			//if ((character[0].x + 1) * 50 < window_size_w && !collision(CharA, CharB))
-				character[0].x += character[0].speed;
-			break;
-		case VK_UP:
-			if ((character[0].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y - character[0].speed != character[1].y))
-			//if ((character[0].y) * 50 > 0 && !collision(CharA, CharB))
-				character[0].y -= character[0].speed;
-			break;
-		case VK_DOWN:
-			if ((character[0].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y + character[0].speed != character[1].y))
-			//if ((character[0].y + 1) * 50 < window_size_d && !collision(CharA, CharB))
-				character[0].y += character[0].speed;
+		case 'a':
+		case 'A':
+			if ((character[0].x) * 50 > 0 && (character[0].y != character[1].y || character[0].x - character[0].speed != character[1].x)) {
+				//if ((character[0].x) * 50 > 0 && !collision(CharA, CharB))
+				character[0].x -= character[0].speed; character[0].diff = 3;
+				movementA = (movementA + 1) % 4;
+			}
 			break;
 		case 'D':
 		case 'd':
-			if ((character[1].x + 1) * 50 < window_size_w && (character[0].x != character[1].x + character[1].speed || character[0].y != character[1].y))
-			//if ((character[1].x + 1) * 50 < window_size_w)
-				character[1].x += character[1].speed;
+			if ((character[0].x + 1) * 50 < window_size_w && (character[0].x + character[0].speed != character[1].x || character[0].y != character[1].y)) {
+				//if ((character[0].x + 1) * 50 < window_size_w && !collision(CharA, CharB))
+				character[0].x += character[0].speed; character[0].diff = 4;
+				movementA = (movementA + 1) % 4;
+			}
 			break;
 		case 'W':
 		case 'w':
-			if ((character[1].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y != character[1].y - character[1].speed))
-			//if ((character[1].y) * 50 > 0)
-				character[1].y -= character[0].speed;
+			if ((character[0].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y - character[0].speed != character[1].y)) {
+				//if ((character[0].y) * 50 > 0 && !collision(CharA, CharB))
+				character[0].y -= character[0].speed; character[0].diff = 1;
+				movementA = (movementA + 1) % 4;
+			}
 			break;
 		case 'S':
 		case 's':
-			if ((character[1].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y != character[1].y + character[1].speed))
-			//if ((character[1].y + 1) * 50 < window_size_d)
-				character[1].y += character[0].speed;
+			if ((character[0].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y + character[0].speed != character[1].y)) {
+				//if ((character[0].y + 1) * 50 < window_size_d && !collision(CharA, CharB))
+				character[0].y += character[0].speed; character[0].diff = 2;
+				movementA = (movementA + 1) % 4;
+			}
 			break;
-		case 'a':
-		case 'A':
-			if ((character[1].x) * 50 > 0 && (character[0].x != character[1].x - character[1].speed || character[0].y != character[1].y))
-			//if ((character[1].x) * 50 > 0)
-				character[1].x -= character[1].speed;
+
+		case VK_RIGHT:
+			if ((character[1].x + 1) * 50 < window_size_w && (character[0].x != character[1].x + character[1].speed || character[0].y != character[1].y)) {
+				//if ((character[1].x + 1) * 50 < window_size_w)
+				character[1].x += character[1].speed; character[1].diff = 4;
+				movementB = (movementB + 1) % 4;
+			}
+			break;
+		case VK_UP:
+			if ((character[1].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y != character[1].y - character[1].speed)) {
+				//if ((character[1].y) * 50 > 0)
+				character[1].y -= character[0].speed; character[1].diff = 1;
+				movementB = (movementB + 1) % 4;
+			}
+			break;
+		case VK_DOWN:
+			if ((character[1].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y != character[1].y + character[1].speed)) {
+				//if ((character[1].y + 1) * 50 < window_size_d)
+				character[1].y += character[0].speed; character[1].diff = 2;
+				movementB = (movementB + 1) % 4;
+			}
+			break;
+		case VK_LEFT:
+			if ((character[1].x) * 50 > 0 && (character[0].x != character[1].x - character[1].speed || character[0].y != character[1].y)) {
+				//if ((character[1].x) * 50 > 0)
+				character[1].x -= character[1].speed; character[1].diff = 3;
+				movementB = (movementB + 1) % 4;
+			}
 			break; }
 		case 'f':
 		case 'F':
-			if (bubble_num[1] > count2) {
-				//++bubble_num[1]; 
-				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
-				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
-				count2 = (count2 + 1) % (character[1].num_bubble+1);
-			}
-			break;
-		case 0x60:
 			if (bubble_num[0] > count1) {
 				//++bubble_num[0]; 
 				bubble[count1].x = character[0].x; bubble[count1].y = character[0].y;
@@ -337,10 +372,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				count1 = (count1 + 1) % (character[0].num_bubble+1);
 			}
 			break;
+		case 0x60:
+			if (bubble_num[1] > count2) {
+				//++bubble_num[1]; 
+				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
+				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
+				count2 = (count2 + 1) % (character[1].num_bubble+1);
+			}
+			break;
+		case VK_ESCAPE:
+			exit(1);
+			break;
 		default:
 			break;
 		}
 		InvalidateRect(hWnd, NULL, TRUE);
+		break;
+	case WM_KEYUP:
+		movementA = 1; movementB = 1;
+		InvalidateRect(hWnd, NULL, FALSE);
 		break;
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
@@ -353,54 +403,72 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 		for (int i = 0; i < bubble_num[0]; i++)
 		{
-			if (bubble[i].on == 1)
-				Rectangle(hdc, bubble[i].x * 50, bubble[i].y * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 1) * 50);
+			if (bubble[i].on == 1) {
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, bubble[i].x * 50, bubble[i].y * 50, 50, 50, memdc, 37 * Bubble_move, 0, 37, 50, SRCCOPY);
+				//Rectangle(hdc, bubble[i].x * 50, bubble[i].y * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 1) * 50);
+			}
 		}
 		for (int i = 0; i < bubble_num[1]; i++)
 		{
-			if (bubble[6 + i].on == 1)
-				Rectangle(hdc, bubble[6 + i].x * 50, bubble[6 + i].y * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 1) * 50);
+			if (bubble[6 + i].on == 1) {
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, bubble[6 + i].x * 50, bubble[6 + i].y * 50, 50, 50, memdc, 37 * Bubble_move, 0, 37, 50, SRCCOPY);
+				//Rectangle(hdc, bubble[6 + i].x * 50, bubble[6 + i].y * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 1) * 50);
+			}
 		}
-		hBrush = CreateSolidBrush(RGB(0, 0, 255));
-		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+
 		for (int i = 0; i < bubble_num[0]; i++)
 		{
 			if (bubble[i].pop == 1)
 			{
-				Rectangle(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 0) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 1) * 50);
-				Rectangle(hdc, (bubble[i].x + 1) * 50, (bubble[i].y + 0) * 50, (bubble[i].x + 2) * 50, (bubble[i].y + 1) * 50);
-				Rectangle(hdc, (bubble[i].x - 1) * 50, (bubble[i].y + 0) * 50, (bubble[i].x + 0) * 50, (bubble[i].y + 1) * 50);
-				Rectangle(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 1) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 2) * 50);
-				Rectangle(hdc, (bubble[i].x + 0) * 50, (bubble[i].y - 1) * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 0) * 50);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 0) * 50, 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP8));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[i].x + 1) * 50, (bubble[i].y + 0) * 50, character[0].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[i].x - 1) * 50, (bubble[i].y + 0) * 50, character[0].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP10));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 1) * 50, 50, character[0].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP9));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y - 1) * 50, 50, character[0].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 			}
 		}
 		for (int i = 0; i < bubble_num[1]; i++)
 		{
 			if (bubble[6 + i].pop == 1)
 			{
-				Rectangle(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 0) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 1) * 50);
-				Rectangle(hdc, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 0) * 50, (bubble[6 + i].x + 2) * 50, (bubble[6 + i].y + 1) * 50);
-				Rectangle(hdc, (bubble[6 + i].x - 1) * 50, (bubble[6 + i].y + 0) * 50, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50);
-				Rectangle(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 2) * 50);
-				Rectangle(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y - 1) * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 0) * 50);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 0) * 50, 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP8));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 0) * 50, character[1].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[6 + i].x - 1) * 50, (bubble[6 + i].y + 0) * 50, character[1].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP10));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50, 50, character[1].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP9));
+				SelectObject(memdc, hBit3);
+				StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y - 1) * 50, 50, character[1].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 			}
 		}
 
-		hBrush = CreateSolidBrush(RGB(255, 0, 0));
-		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-		if (character[0].state == 0)
-			Rectangle(hdc, character[0].x * 50, character[0].y * 50, (character[0].x + 1) * 50, (character[0].y + 1)* 50);
-		hBrush = CreateSolidBrush(RGB(0, 255, 0));
-		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-		if (character[1].state == 0)
-			Rectangle(hdc, character[1].x * 50, character[1].y * 50, (character[1].x + 1) * 50, (character[1].y + 1) * 50);
-		hBrush = CreateSolidBrush(RGB(125, 125, 125));
-		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-		if (character[0].state == 1) {
-			Rectangle(hdc, character[0].x * 50, character[0].y * 50, (character[0].x + 1) * 50, (character[0].y + 1) * 50);
+		if (character[0].state == 0) {
+			SelectObject(memdc, hBit1);
+			StretchBlt(hdc, character[0].x * 50, character[0].y * 50, 50, 50, memdc, 50 * movementA, 60 * character[0].diff, 50, 60, SRCCOPY);
 		}
-		if (character[1].state == 1) {
-			Rectangle(hdc, character[1].x * 50, character[1].y * 50, (character[1].x + 1) * 50, (character[1].y + 1) * 50);
+
+		if (character[1].state == 0) {
+			SelectObject(memdc, hBit2);
+			StretchBlt(hdc, character[1].x * 50, character[1].y * 50, 50, 50, memdc, 50 * movementB, 60 * character[1].diff, 50, 60, SRCCOPY);
 		}
 
 		DeleteDC(memdc);

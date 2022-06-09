@@ -147,6 +147,25 @@
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\bazziDown.bmp" />
+    <Image Include="Resources\bazziLeft.bmp" />
+    <Image Include="Resources\bazziRight.bmp" />
+    <Image Include="Resources\bazziUp.bmp" />
+    <Image Include="Resources\bomb_already.bmp" />
+    <Image Include="Resources\boom_center.bmp" />
+    <Image Include="Resources\boom_down.bmp" />
+    <Image Include="Resources\boom_left.bmp" />
+    <Image Include="Resources\boom_right.bmp" />
+    <Image Include="Resources\boom_up.bmp" />
+    <Image Include="Resources\box.bmp" />
+    <Image Include="Resources\house.bmp" />
+    <Image Include="Resources\Image\bazzi.bmp" />
+    <Image Include="Resources\Image\dao.bmp" />
+    <Image Include="Resources\Image\digenie.bmp" />
+    <Image Include="Resources\Image\house_blue.bmp" />
+    <Image Include="Resources\Image\uni.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

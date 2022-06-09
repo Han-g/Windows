@@ -63,15 +63,15 @@ BEGIN
     CONTROL         "CAMP08",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,88,50,64,16
     CONTROL         "VILLAGE10",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,178,50,64,16
     CONTROL         "PATRIT14",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,267,50,64,16
-    CONTROL         "DAO",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,54,117,131,16
-    CONTROL         "DIZNI",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,54,132,131,16
-    CONTROL         "UNI",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,54,147,131,16
-    CONTROL         "MARID",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,54,162,131,16
+    CONTROL         "BAZZI",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_GROUP,54,117,131,16
+    CONTROL         "DAO",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,54,132,131,16
+    CONTROL         "DIZNI",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,54,147,131,16
+    CONTROL         "UNI",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,54,162,131,16
     CONTROL         "RANDOM",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,54,177,131,16
-    CONTROL         "DAO",IDC_RADIO9,"Button",BS_AUTORADIOBUTTON | WS_GROUP,221,118,131,16
-    CONTROL         "DIZNI",IDC_RADIO10,"Button",BS_AUTORADIOBUTTON,221,133,131,16
-    CONTROL         "UNI",IDC_RADIO11,"Button",BS_AUTORADIOBUTTON,221,148,131,16
-    CONTROL         "MARID",IDC_RADIO12,"Button",BS_AUTORADIOBUTTON,221,163,131,16
+    CONTROL         "BAZZI",IDC_RADIO9,"Button",BS_AUTORADIOBUTTON | WS_GROUP,221,118,131,16
+    CONTROL         "DAO",IDC_RADIO10,"Button",BS_AUTORADIOBUTTON,221,133,131,16
+    CONTROL         "DIZNI",IDC_RADIO11,"Button",BS_AUTORADIOBUTTON,221,148,131,16
+    CONTROL         "UNI",IDC_RADIO12,"Button",BS_AUTORADIOBUTTON,221,163,131,16
     CONTROL         "RANDOM",IDC_RADIO13,"Button",BS_AUTORADIOBUTTON,221,178,131,16
 END
 
@@ -104,6 +104,46 @@ IDD_DIALOG1 AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP1             BITMAP                  "Resources\\bazziDown.bmp"
+
+IDB_BITMAP2             BITMAP                  "Resources\\bazziLeft.bmp"
+
+IDB_BITMAP3             BITMAP                  "Resources\\bazziRight.bmp"
+
+IDB_BITMAP4             BITMAP                  "Resources\\bazziUp.bmp"
+
+IDB_BITMAP5             BITMAP                  "Resources\\bomb_already.bmp"
+
+IDB_BITMAP6             BITMAP                  "Resources\\boom_center.bmp"
+
+IDB_BITMAP7             BITMAP                  "Resources\\boom_left.bmp"
+
+IDB_BITMAP8             BITMAP                  "Resources\\boom_right.bmp"
+
+IDB_BITMAP9             BITMAP                  "Resources\\boom_up.bmp"
+
+IDB_BITMAP10            BITMAP                  "Resources\\boom_down.bmp"
+
+IDB_BITMAP11            BITMAP                  "Resources\\Image\\bazzi.bmp"
+
+IDB_BITMAP12            BITMAP                  "Resources\\Image\\dao.bmp"
+
+IDB_BITMAP13            BITMAP                  "Resources\\Image\\digenie.bmp"
+
+IDB_BITMAP14            BITMAP                  "Resources\\Image\\uni.bmp"
+
+IDB_BITMAP15            BITMAP                  "Resources\\Image\\house_blue.bmp"
+
+IDB_BITMAP16            BITMAP                  "Resources\\box.bmp"
+
+IDB_BITMAP17            BITMAP                  "Resources\\house.bmp"
 
 #endif    // 한국어(대한민국) resources
 /////////////////////////////////////////////////////////////////////////////

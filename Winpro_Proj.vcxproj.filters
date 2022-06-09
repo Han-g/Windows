@@ -29,4 +29,57 @@
       <Filter>리소스 파일</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\bazziDown.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\bazziLeft.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\bazziRight.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\bazziUp.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\bomb_already.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\boom_center.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\boom_left.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\boom_right.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\boom_up.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\boom_down.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\Image\bazzi.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\Image\dao.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\Image\digenie.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\Image\uni.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\Image\house_blue.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\box.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="Resources\house.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
