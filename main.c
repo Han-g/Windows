@@ -159,12 +159,48 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					obj[y][x].x = x; obj[y][x].y = y; obj[y][x].kind = 2;
 				}
 
+			{
+				obj[0][0].kind = 1; obj[1][0].kind = 1; obj[2][0].kind = 1; obj[2][1].kind = 1;
+				obj[0][13].kind = 1; obj[1][12].kind = 1; obj[1][13].kind = 1; obj[1][14].kind = 1;
+				obj[0][6].kind = 1; obj[0][7].kind = 1; obj[1][7].kind = 1; obj[1][8].kind = 1;
+				obj[2][6].kind = 1;
+				obj[3][7].kind = 1; obj[3][8].kind = 1; obj[4][6].kind = 1; obj[4][7].kind = 1;
+				obj[5][8].kind = 1; obj[5][9].kind = 1;
+				obj[6][6].kind = 1; obj[6][7].kind = 1; obj[7][7].kind = 1; obj[7][8].kind = 1;
+				obj[7][5].kind = 1; obj[8][6].kind = 1;
+				obj[9][8].kind = 1; obj[9][7].kind = 1; obj[10][6].kind = 1; obj[10][7].kind = 1;
+				obj[11][8].kind = 1;
+				obj[12][6].kind = 1; obj[12][7].kind = 1;
+				obj[11][0].kind = 1; obj[10][1].kind = 1; obj[11][1].kind = 1; obj[12][1].kind = 1;
+				obj[10][14].kind = 1; obj[11][14].kind = 1; obj[12][14].kind = 1; obj[12][13].kind = 1; }
+
+			character[0].x = 1; character[0].y = 2;
+			character[1].x = 13; character[1].y = 1;
+
 			break;
 		case 3:		// patrit14
 			for (int y = 0; y < 13; y++)
 				for (int x = 0; x < 15; x++) {
 					obj[y][x].x = x; obj[y][x].y = y; obj[y][x].kind = 2;
 				}
+
+			{
+				obj[0][4].kind = 1; obj[0][5].kind = 1; obj[0][6].kind = 1; obj[0][8].kind = 1; obj[0][9].kind = 1; obj[0][10].kind = 1;
+				obj[1][3].kind = 1; obj[1][7].kind = 1; obj[1][11].kind = 1;
+				obj[2][2].kind = 1; obj[2][4].kind = 1; obj[2][6].kind = 1; obj[2][8].kind = 1; obj[2][10].kind = 1; obj[2][12].kind = 1;
+				obj[3][1].kind = 1; obj[4][1].kind = 1; obj[5][1].kind = 1; obj[6][1].kind = 1; 
+				obj[3][13].kind = 1; obj[4][13].kind = 1; obj[5][13].kind = 1; obj[6][13].kind = 1; 
+				obj[3][3].kind = 1; obj[3][11].kind = 1; obj[5][3].kind = 1; obj[5][11].kind = 1;
+				obj[9][4].kind = 1; obj[9][6].kind = 1; obj[9][8].kind = 1; obj[9][10].kind = 1;
+				obj[8][3].kind = 1; obj[8][11].kind = 1;
+				obj[7][10].kind = 1; obj[7][10].kind = 1; obj[7][10].kind = 1; obj[7][10].kind = 1;
+				obj[10][2].kind = 1; obj[11][2].kind = 1; obj[12][2].kind = 1; obj[12][1].kind = 1; 
+				obj[10][12].kind = 1; obj[11][12].kind = 1; obj[12][12].kind = 1; obj[12][13].kind = 1;
+				obj[10][5].kind = 1; obj[10][9].kind = 1; obj[11][6].kind = 1; obj[11][7].kind = 1; obj[11][8].kind = 1;
+			}
+
+			character[0].x = 2; character[0].y = 12;
+			character[1].x = 12; character[1].y = 12;
 
 			break;
 		default:
