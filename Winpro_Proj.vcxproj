@@ -139,9 +139,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cImage.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="cImageBlock.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="cImageHouse.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="cImageTree.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="cMap.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cImage.h" />
+    <ClInclude Include="cImageBlock.h" />
+    <ClInclude Include="cImageHouse.h" />
+    <ClInclude Include="cImageTree.h" />
+    <ClInclude Include="cMap.h" />
+    <ClInclude Include="Define.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -158,12 +179,9 @@
     <Image Include="Resources\boom_left.bmp" />
     <Image Include="Resources\boom_right.bmp" />
     <Image Include="Resources\boom_up.bmp" />
-    <Image Include="Resources\box.bmp" />
-    <Image Include="Resources\house.bmp" />
     <Image Include="Resources\Image\bazzi.bmp" />
     <Image Include="Resources\Image\dao.bmp" />
     <Image Include="Resources\Image\digenie.bmp" />
-    <Image Include="Resources\Image\house_blue.bmp" />
     <Image Include="Resources\Image\uni.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

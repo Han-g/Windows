@@ -1,7 +1,6 @@
 #pragma once
 #include "Define.h"
 
-
 class cImage
 {
 protected:
@@ -27,7 +26,7 @@ public:
 
 	void Draw(HDC hdc, int x, int y);
 	void Draw(HDC hdc, int x, int y, int srcX, int srcY);
-	void Draw(HDC hdc, int destX, int destY, 
+	void Draw(HDC hdc, int destX, int destY,
 		int width, int height, int srcX, int srcY);
 	void DrawTrans(HDC hdc, int x, int y, int srcX, int srcY,
 		int srcW, int srcH);
@@ -36,9 +35,10 @@ public:
 
 	int		GetPosX(void);
 	int		GetPosY(void);
-	POINT&	GetPoint(void);
-	RECT&	GetRect(void);
-	
+	POINT& GetPoint(void);
+	RECT& GetRect(void);
+
 	void	SetPoint(int x, int y);
 	void	SetRect(int left, int top, int right, int bottom);
 };
+

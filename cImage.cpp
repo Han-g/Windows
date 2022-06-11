@@ -11,8 +11,8 @@ cImage::~cImage(void)
 
 HRESULT cImage::Init(int width, int height)
 {
-	m_nWidth	= width;
-	m_nHeight	= height;
+	m_nWidth = width;
+	m_nHeight = height;
 
 	HDC hdc = GetDC(g_hWnd);
 
@@ -25,16 +25,17 @@ HRESULT cImage::Init(int width, int height)
 	return S_OK;
 }
 
-HRESULT cImage::Init(const char *filename, int width, int height)
+HRESULT cImage::Init(const char* filename, int width, int height)
 {
-	m_nWidth	= width;
-	m_nHeight	= height;
+	m_nWidth = width;
+	m_nHeight = height;
 
 	HDC hdc = GetDC(g_hWnd);
 
 	m_DC = CreateCompatibleDC(hdc);
-	//m_newBit = (HBITMAP)LoadImage(g_hInst, filename, IMAGE_BITMAP, width, height, LR_LOADFROMFILE);
-	//m_oldBit = (HBITMAP)SelectObject(m_DC, m_newBit);
+	m_newBit = (HBITMAP)LoadImage(g_hInst, filename,
+		IMAGE_BITMAP, width, height, LR_LOADFROMFILE);
+	m_oldBit = (HBITMAP)SelectObject(m_DC, m_newBit);
 
 	ReleaseDC(g_hWnd, hdc);
 
@@ -49,7 +50,7 @@ void cImage::Release(void)
 
 void cImage::Draw(HDC hdc, int x, int y)
 {
-	BitBlt(hdc, x, y, m_nWidth, m_nHeight, 
+	BitBlt(hdc, x, y, m_nWidth, m_nHeight,
 		m_DC, 0, 0, SRCCOPY);
 }
 
@@ -59,16 +60,16 @@ void cImage::Draw(HDC hdc, int x, int y, int srcX, int srcY)
 		m_DC, srcX, srcY, SRCCOPY);
 }
 
-void cImage::Draw(HDC hdc, int destX, int destY, 
-				  int width, int height, int srcX, int srcY)
+void cImage::Draw(HDC hdc, int destX, int destY,
+	int width, int height, int srcX, int srcY)
 {
 	BitBlt(hdc, destX, destY, width, height,
 		m_DC, srcX, srcY, SRCCOPY);
 }
 
-void cImage::DrawTrans(HDC hdc, int x, int y, 
-					   int srcX, int srcY, int srcW, 
-					   int srcH)
+void cImage::DrawTrans(HDC hdc, int x, int y,
+	int srcX, int srcY, int srcW,
+	int srcH)
 {
 	GdiTransparentBlt(hdc, x, y, srcW, srcH,
 		m_DC, srcX, srcY, srcW, srcH, COLOR);
@@ -108,8 +109,8 @@ void cImage::SetPoint(int x, int y)
 
 void cImage::SetRect(int left, int top, int right, int bottom)
 {
-	m_Rect.left		= left;
-	m_Rect.top		= top;
-	m_Rect.right	= right;
-	m_Rect.bottom	= bottom;
+	m_Rect.left = left;
+	m_Rect.top = top;
+	m_Rect.right = right;
+	m_Rect.bottom = bottom;
 }

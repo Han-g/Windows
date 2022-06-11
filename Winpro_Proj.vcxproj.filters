@@ -18,9 +18,42 @@
     <ClCompile Include="main.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="cMap.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cImage.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cImageHouse.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cImageBlock.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="cImageTree.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cMap.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Define.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cImage.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cImageHouse.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cImageBlock.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cImageTree.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -60,9 +93,6 @@
     <Image Include="Resources\boom_down.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="Resources\Image\bazzi.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
     <Image Include="Resources\Image\dao.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
@@ -72,13 +102,7 @@
     <Image Include="Resources\Image\uni.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="Resources\Image\house_blue.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="Resources\box.bmp">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="Resources\house.bmp">
+    <Image Include="Resources\Image\bazzi.bmp">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

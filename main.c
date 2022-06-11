@@ -2,17 +2,14 @@
 #define window_size_d 650
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "cImage.h"
-#include "cImageBlock.h"
-#include "cImageHouse.h"
-#include "resource.h"
-
 #include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <ctype.h>
+#include <time.h>
 #include <math.h>
+#include "resource.h"
 
 typedef struct box {
 	int left, top, right, bottom;
@@ -105,7 +102,7 @@ typedef struct OBJECT {
 	int x, y, kind;
 }Object;
 typedef struct ITEM {
-	int x, y, kind;
+	int kind;
 }Item;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -117,44 +114,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HBITMAP hBit1, hBit2, hBit3;
 	//HBITMAP oldBit1, oldBit2;
 	static int bubble_num[2] = { 1,1 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0;
-	static int start_x[2], start_y[2];
+	static int x = 0, y = 0, w = 330, h = 240, mx = 0, my = 0, mw = 1600, mh = 1200;
 	static Character character[2];
 	static Bubble bubble[14];
 	static Object obj;
 	static Item item;
+	int random = rand() % 4 + 1;
 
 	switch (uMsg) {
 	case WM_CREATE:
 		DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, Dlalog_Proc);
-		//hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
-		//hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
-		hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
+		//hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP1));
+		//hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP1));
+		//hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
 
+		character[0].x = 13; character[0].y = 11;
+		character[1].x = 1; character[1].y = 1;
 		switch (map_kind)
 		{
 		case 1:		// camp08
-			start_x[0] = 1; start_y[0] = 1;
-			start_x[1] = 13; start_y[1] = 11;
+
 			break;
 		case 2:		// village10
-			start_x[0] = 1; start_y[0] = 1;
-			start_x[1] = 13; start_y[1] = 11;
+
 			break;
 		case 3:		// patrit14
-			start_x[0] = 1; start_y[0] = 1;
-			start_x[1] = 13; start_y[1] = 11;
+
 			break;
 		default:
 			break;
 		}
 
-		character[0].x = start_x[0]; character[0].y = start_y[0];
-		character[1].x = start_x[1]; character[1].y = start_y[1];
-
+		// character setting
+		
 		switch (fst_char_kind)
 		{
 		case 1:
-			// character setting
 			hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
 			character[0].num_bubble = 1;
 			character[0].speed = 1;
@@ -187,13 +182,45 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			character[0].state = 0;
 			break;
 		case 5:
-		{	int random = rand() % 4;
-			hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(113 + random));
-			character[0].num_bubble = 1;
-			character[0].speed = 1;
-			character[0].bubble_len = 1;
-			character[0].kind = 5;
-			character[0].state = 0; }
+		{
+			switch (random)
+			{
+			case 5:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
+				character[0].num_bubble = 1;
+				character[0].speed = 1;
+				character[0].bubble_len = 1;
+				character[0].kind = 1;
+				character[0].state = 0;
+				break;
+			case 6:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP12));
+				character[0].num_bubble = 1;
+				character[0].speed = 1;
+				character[0].bubble_len = 1;
+				character[0].kind = 2;
+				character[0].state = 0;
+				break;
+			case 7:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP13));
+				character[0].num_bubble = 1;
+				character[0].speed = 1;
+				character[0].bubble_len = 1;
+				character[0].kind = 3;
+				character[0].state = 0;
+				break;
+			case 8:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP14));
+				character[0].num_bubble = 1;
+				character[0].speed = 1;
+				character[0].bubble_len = 1;
+				character[0].kind = 4;
+				character[0].state = 0;
+				break;
+			default:
+				break;
+			}
+		}
 			break;
 		default:
 			break;
@@ -234,14 +261,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			character[1].state = 0;
 			break;
 		case 5:
-		{	int random = rand() % 4;
-			hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(113 + random));
-			character[1].num_bubble = 1;
-			character[1].speed = 1;
-			character[1].bubble_len = 1;
-			character[1].kind = 5;
-			character[1].state = 0; }
-			break;
+		{
+			random = (random + 1) % 4;
+			switch (random)
+			{
+			case 1:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP11));
+				character[1].num_bubble = 1;
+				character[1].speed = 1;
+				character[1].bubble_len = 1;
+				character[1].kind = 1;
+				character[1].state = 0;
+				break;
+			case 2:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP12));
+				character[1].num_bubble = 1;
+				character[1].speed = 1;
+				character[1].bubble_len = 1;
+				character[1].kind = 2;
+				character[1].state = 0;
+				break;
+			case 3:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP13));
+				character[1].num_bubble = 1;
+				character[1].speed = 1;
+				character[1].bubble_len = 1;
+				character[1].kind = 3;
+				character[1].state = 0;
+				break;
+			case 4:
+				hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP14));
+				character[1].num_bubble = 1;
+				character[1].speed = 1;
+				character[1].bubble_len = 1;
+				character[1].kind = 4;
+				character[1].state = 0;
+				break;
+			default:
+				break;
+			}
+		}
 		default:
 			break;
 		}
@@ -298,91 +357,86 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_KEYDOWN: // MOVE: wasd // BUBBLE: f  0
 		switch (wParam)
 		{
-			box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
-			box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
-
-			{
-		case 'a':
-		case 'A':
+		box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
+		box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
+			
+		case VK_LEFT:
 			if ((character[0].x) * 50 > 0 && (character[0].y != character[1].y || character[0].x - character[0].speed != character[1].x)) {
-				//if ((character[0].x) * 50 > 0 && !collision(CharA, CharB))
 				character[0].x -= character[0].speed; character[0].diff = 3;
 				movementA = (movementA + 1) % 4;
 			}
 			break;
-		case 'D':
-		case 'd':
+		case VK_RIGHT:
 			if ((character[0].x + 1) * 50 < window_size_w && (character[0].x + character[0].speed != character[1].x || character[0].y != character[1].y)) {
-				//if ((character[0].x + 1) * 50 < window_size_w && !collision(CharA, CharB))
 				character[0].x += character[0].speed; character[0].diff = 4;
 				movementA = (movementA + 1) % 4;
 			}
 			break;
-		case 'W':
-		case 'w':
+		case VK_UP:
 			if ((character[0].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y - character[0].speed != character[1].y)) {
-				//if ((character[0].y) * 50 > 0 && !collision(CharA, CharB))
 				character[0].y -= character[0].speed; character[0].diff = 1;
 				movementA = (movementA + 1) % 4;
 			}
 			break;
-		case 'S':
-		case 's':
+		case VK_DOWN:
 			if ((character[0].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y + character[0].speed != character[1].y)) {
-				//if ((character[0].y + 1) * 50 < window_size_d && !collision(CharA, CharB))
 				character[0].y += character[0].speed; character[0].diff = 2;
 				movementA = (movementA + 1) % 4;
 			}
 			break;
 
-		case VK_RIGHT:
+
+		case 'D':
+		case 'd':
 			if ((character[1].x + 1) * 50 < window_size_w && (character[0].x != character[1].x + character[1].speed || character[0].y != character[1].y)) {
-				//if ((character[1].x + 1) * 50 < window_size_w)
 				character[1].x += character[1].speed; character[1].diff = 4;
 				movementB = (movementB + 1) % 4;
 			}
 			break;
-		case VK_UP:
+		case 'W':
+		case 'w':
 			if ((character[1].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y != character[1].y - character[1].speed)) {
-				//if ((character[1].y) * 50 > 0)
 				character[1].y -= character[0].speed; character[1].diff = 1;
 				movementB = (movementB + 1) % 4;
 			}
 			break;
-		case VK_DOWN:
+		case 'S':
+		case 's':
 			if ((character[1].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y != character[1].y + character[1].speed)) {
-				//if ((character[1].y + 1) * 50 < window_size_d)
 				character[1].y += character[0].speed; character[1].diff = 2;
 				movementB = (movementB + 1) % 4;
 			}
 			break;
-		case VK_LEFT:
+		case 'a':
+		case 'A':
 			if ((character[1].x) * 50 > 0 && (character[0].x != character[1].x - character[1].speed || character[0].y != character[1].y)) {
-				//if ((character[1].x) * 50 > 0)
 				character[1].x -= character[1].speed; character[1].diff = 3;
 				movementB = (movementB + 1) % 4;
 			}
-			break; }
+			break;
+
+
 		case 'f':
 		case 'F':
-			if (bubble_num[0] > count1) {
-				//++bubble_num[0]; 
-				bubble[count1].x = character[0].x; bubble[count1].y = character[0].y;
-				bubble[count1].time = 0; bubble[count1].on = 1;
-				count1 = (count1 + 1) % (character[0].num_bubble+1);
-			}
-			break;
-		case 0x60:
 			if (bubble_num[1] > count2) {
-				//++bubble_num[1]; 
 				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
 				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
 				count2 = (count2 + 1) % (character[1].num_bubble+1);
 			}
 			break;
+		case 0x60:
+			if (bubble_num[0] > count1) {
+				bubble[count1].x = character[0].x; bubble[count1].y = character[0].y;
+				bubble[count1].time = 0; bubble[count1].on = 1;
+				count1 = (count1 + 1) % (character[0].num_bubble+1);
+			}
+			break;
+
+
 		case VK_ESCAPE:
 			exit(1);
 			break;
+
 		default:
 			break;
 		}
@@ -406,7 +460,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (bubble[i].on == 1) {
 				SelectObject(memdc, hBit3);
 				StretchBlt(hdc, bubble[i].x * 50, bubble[i].y * 50, 50, 50, memdc, 37 * Bubble_move, 0, 37, 50, SRCCOPY);
-				//Rectangle(hdc, bubble[i].x * 50, bubble[i].y * 50, (bubble[i].x + 1) * 50, (bubble[i].y + 1) * 50);
 			}
 		}
 		for (int i = 0; i < bubble_num[1]; i++)
@@ -414,10 +467,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			if (bubble[6 + i].on == 1) {
 				SelectObject(memdc, hBit3);
 				StretchBlt(hdc, bubble[6 + i].x * 50, bubble[6 + i].y * 50, 50, 50, memdc, 37 * Bubble_move, 0, 37, 50, SRCCOPY);
-				//Rectangle(hdc, bubble[6 + i].x * 50, bubble[6 + i].y * 50, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 1) * 50);
 			}
 		}
-
+		hBrush = CreateSolidBrush(RGB(0, 0, 255));
+		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
 		for (int i = 0; i < bubble_num[0]; i++)
 		{
 			if (bubble[i].pop == 1)

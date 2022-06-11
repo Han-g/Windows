@@ -1,24 +1,16 @@
-#include "cImageBlock.h"
-#include "Define.h"
+#pragma once
+#include "cimage.h"
 
-cImageBlock::cImageBlock(void)
+class cImageBlock :
+	public cImage
 {
-}
+public:
+	RECT	   m_Rect;
 
-cImageBlock::~cImageBlock(void)
-{
-}
+public:
+	cImageBlock(void);
+	~cImageBlock(void);
 
-void cImageBlock::Draw(HDC hdc, int destX, int destY, int width, int height, int srcX, int srcY)
-{
-	BitBlt(hdc, destX, destY, width, height,
-		m_DC, srcX, srcY, SRCCOPY);
-
-	m_Pos.x = destX;
-	m_Pos.y = destY;
-
-	m_Rect.left		= destX;
-	m_Rect.right	= destX + OBJ_TILE_W;
-	m_Rect.top		= destY + OBJ_BLOCK_H - OBJ_TILE_H;
-	m_Rect.bottom	= destY + OBJ_BLOCK_H;
-}
+	void Draw(HDC hdc, int destX, int destY,
+		int width, int height, int srcX, int srcY);
+};

@@ -14,13 +14,11 @@
 #define IDB_BITMAP8                     110
 #define IDB_BITMAP9                     111
 #define IDB_BITMAP10                    112
+
 #define IDB_BITMAP11                    113
 #define IDB_BITMAP12                    114
 #define IDB_BITMAP13                    115
 #define IDB_BITMAP14                    116
-#define IDB_BITMAP15                    117
-#define IDB_BITMAP16                    118
-#define IDB_BITMAP17                    119
 
 #define IDC_RADIO1                      1001
 #define IDC_RADIO2                      1002
@@ -42,7 +40,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        120
+#define _APS_NEXT_RESOURCE_VALUE        117
 #define _APS_NEXT_COMMAND_VALUE         40001
 #define _APS_NEXT_CONTROL_VALUE         1005
 #define _APS_NEXT_SYMED_VALUE           101
