@@ -117,7 +117,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static int x = 0, y = 0, w = 330, h = 240, mx = 0, my = 0, mw = 1600, mh = 1200;
 	static Character character[2];
 	static Bubble bubble[14];
-	static Object obj;
+	static Object obj[13][15];
 	static Item item;
 	int random = rand() % 4 + 1;
 
@@ -130,15 +130,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		character[0].x = 13; character[0].y = 11;
 		character[1].x = 1; character[1].y = 1;
-		switch (map_kind)
+		switch (map_kind) // MAP SETTING
 		{
-		case 1:		// camp08
+		case 1:		// forest07
+			for (int y = 0; y < 13;y++)
+				for (int x = 0; x < 15; x++) {
+					obj[y][x].x = x; obj[y][x].y = y; obj[y][x].kind = 2;
+				}
+
+			{	
+			obj[0][0].kind = 1; obj[1][0].kind = 1; obj[4][0].kind = 1;
+			obj[5][0].kind = 1; obj[8][0].kind = 1; obj[9][0].kind = 1;
+			obj[11][0].kind = 1; obj[12][0].kind = 1; obj[1][1].kind = 1;
+			obj[5][1].kind = 1; obj[3][1].kind = 1; obj[11][1].kind = 1;
+			obj[1][5].kind = 1; obj[1][6].kind = 1; obj[2][6].kind = 1;
+			obj[11][8].kind = 1; obj[11][9].kind = 1; obj[10][9].kind = 1;
+			obj[7][9].kind = 1; obj[7][10].kind = 1; obj[6][10].kind = 1;
+			obj[3][9].kind = 1; obj[3][10].kind = 1; obj[2][10].kind = 1; 
+			obj[9][11].kind = 1; }
+
+			character[0].x = 1; character[0].y = 11;
+			character[1].x = 10; character[1].y = 3;
 
 			break;
 		case 2:		// village10
+			for (int y = 0; y < 13; y++)
+				for (int x = 0; x < 15; x++) {
+					obj[y][x].x = x; obj[y][x].y = y; obj[y][x].kind = 2;
+				}
 
 			break;
 		case 3:		// patrit14
+			for (int y = 0; y < 13; y++)
+				for (int x = 0; x < 15; x++) {
+					obj[y][x].x = x; obj[y][x].y = y; obj[y][x].kind = 2;
+				}
 
 			break;
 		default:
@@ -360,57 +386,66 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
 		box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
 			
-		case VK_LEFT:
+
+		case 'a':
+		case 'A':
 			if ((character[0].x) * 50 > 0 && (character[0].y != character[1].y || character[0].x - character[0].speed != character[1].x)) {
-				character[0].x -= character[0].speed; character[0].diff = 3;
+				if (obj[character[0].y][character[0].x-1].kind == 1)
+					character[0].x -= character[0].speed; character[0].diff = 3;
 				movementA = (movementA + 1) % 4;
 			}
 			break;
-		case VK_RIGHT:
-			if ((character[0].x + 1) * 50 < window_size_w && (character[0].x + character[0].speed != character[1].x || character[0].y != character[1].y)) {
-				character[0].x += character[0].speed; character[0].diff = 4;
-				movementA = (movementA + 1) % 4;
-			}
-			break;
-		case VK_UP:
-			if ((character[0].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y - character[0].speed != character[1].y)) {
-				character[0].y -= character[0].speed; character[0].diff = 1;
-				movementA = (movementA + 1) % 4;
-			}
-			break;
-		case VK_DOWN:
-			if ((character[0].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y + character[0].speed != character[1].y)) {
-				character[0].y += character[0].speed; character[0].diff = 2;
-				movementA = (movementA + 1) % 4;
-			}
-			break;
-
-
 		case 'D':
 		case 'd':
-			if ((character[1].x + 1) * 50 < window_size_w && (character[0].x != character[1].x + character[1].speed || character[0].y != character[1].y)) {
-				character[1].x += character[1].speed; character[1].diff = 4;
-				movementB = (movementB + 1) % 4;
+			if ((character[0].x + 1) * 50 < window_size_w && (character[0].x + character[0].speed != character[1].x || character[0].y != character[1].y)) {
+				if (obj[character[0].y][character[0].x+1].kind == 1)
+					character[0].x += character[0].speed; character[0].diff = 4;
+				movementA = (movementA + 1) % 4;
 			}
 			break;
 		case 'W':
 		case 'w':
-			if ((character[1].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y != character[1].y - character[1].speed)) {
-				character[1].y -= character[0].speed; character[1].diff = 1;
-				movementB = (movementB + 1) % 4;
+			if ((character[0].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y - character[0].speed != character[1].y)) {
+				if (obj[character[0].y-1][character[0].x].kind == 1)
+					character[0].y -= character[0].speed; character[0].diff = 1;
+				movementA = (movementA + 1) % 4;
 			}
 			break;
 		case 'S':
 		case 's':
-			if ((character[1].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y != character[1].y + character[1].speed)) {
-				character[1].y += character[0].speed; character[1].diff = 2;
+			if ((character[0].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y + character[0].speed != character[1].y)) {
+				if (obj[character[0].y+1][character[0].x].kind == 1)
+					character[0].y += character[0].speed; character[0].diff = 2;
+				movementA = (movementA + 1) % 4;
+			}
+			break;
+
+
+		case VK_RIGHT:
+			if ((character[1].x + 1) * 50 < window_size_w && (character[0].x != character[1].x + character[1].speed || character[0].y != character[1].y)) {
+				if (obj[character[1].y][character[1].x+1].kind == 1)
+					character[1].x += character[1].speed; character[1].diff = 4;
 				movementB = (movementB + 1) % 4;
 			}
 			break;
-		case 'a':
-		case 'A':
+		case VK_UP:
+			if ((character[1].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y != character[1].y - character[1].speed)) {
+				if (obj[character[1].y-1][character[1].x].kind == 1)
+					character[1].y -= character[1].speed; character[1].diff = 1;
+				movementB = (movementB + 1) % 4;
+			}
+			break;
+		case VK_DOWN:
+			if ((character[1].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y != character[1].y + character[1].speed)) {
+				if (obj[character[1].y+1][character[1].x].kind == 1)
+					character[1].y += character[1].speed; character[1].diff = 2;
+				movementB = (movementB + 1) % 4;
+			}
+			break;
+		case VK_LEFT:
 			if ((character[1].x) * 50 > 0 && (character[0].x != character[1].x - character[1].speed || character[0].y != character[1].y)) {
-				character[1].x -= character[1].speed; character[1].diff = 3;
+				if (obj[character[1].y][character[1].x-1].kind == 1)
+					character[1].x -= character[1].speed; character[1].diff = 3;
 				movementB = (movementB + 1) % 4;
 			}
 			break;
@@ -418,17 +453,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case 'f':
 		case 'F':
-			if (bubble_num[1] > count2 && character[1].state == 0) {
-				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
-				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
-				count2 = (count2 + 1) % (character[1].num_bubble+1);
-			}
-			break;
-		case 0x60:
 			if (bubble_num[0] > count1 && character[0].state == 0) {
 				bubble[count1].x = character[0].x; bubble[count1].y = character[0].y;
 				bubble[count1].time = 0; bubble[count1].on = 1;
 				count1 = (count1 + 1) % (character[0].num_bubble+1);
+			}
+			break;
+		case 0x60:
+			if (bubble_num[1] > count2 && character[1].state == 0) {
+				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
+				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
+				count2 = (count2 + 1) % (character[1].num_bubble+1);
 			}
 			break;
 
