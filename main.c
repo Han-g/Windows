@@ -418,14 +418,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case 'f':
 		case 'F':
-			if (bubble_num[1] > count2) {
+			if (bubble_num[1] > count2 && character[1].state == 0) {
 				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
 				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
 				count2 = (count2 + 1) % (character[1].num_bubble+1);
 			}
 			break;
 		case 0x60:
-			if (bubble_num[0] > count1) {
+			if (bubble_num[0] > count1 && character[0].state == 0) {
 				bubble[count1].x = character[0].x; bubble[count1].y = character[0].y;
 				bubble[count1].time = 0; bubble[count1].on = 1;
 				count1 = (count1 + 1) % (character[0].num_bubble+1);
