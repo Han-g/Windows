@@ -139,6 +139,16 @@ IDB_BITMAP13            BITMAP                  "Resources\\Image\\uni.bmp"
 
 IDB_BITMAP14            BITMAP                  "Resources\\Image\\bazzi.bmp"
 
+IDB_BITMAP15            BITMAP                  "Resources\\forest\\tile\\tile_7.bmp"
+
+IDB_BITMAP16            BITMAP                  "Resources\\forest\\forest_tile.bmp"
+
+IDB_BITMAP17            BITMAP                  "Resources\\VILLAGE\\VILLAGE_TILE.bmp"
+
+IDB_BITMAP18            BITMAP                  "Resources\\PATRIT\\Box_0.bmp"
+
+IDB_BITMAP19            BITMAP                  "Resources\\Image\\item.bmp"
+
 #endif    // 한국어(대한민국) resources
 /////////////////////////////////////////////////////////////////////////////
 
