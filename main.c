@@ -121,7 +121,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	HBRUSH hBrush, oldBrush;
 	static HBITMAP hBit1, hBit2, hBit3, bgBit1, bgBit2, bgBit3, itemBit;
 	//HBITMAP oldBit1, oldBit2;
-	static int bubble_num[2] = { 0,0 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0;
+	static int bubble_num[2] = { 0,0 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0, playtime = 0, Ascore = 0, Bscore = 0;
 	static int x = 0, y = 0, StartAX = 0, StartAY = 0, StartBX = 0, StartBY = 0, Adead_time = 0, Bdead_time = 0, AMovingTime = 30, BMovingTime = 30;
 	static int blocking_L[14], blocking_R[14], blocking_T[14], blocking_B[14];
 	static Character character[2];
@@ -422,6 +422,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		AMovingTime = 10 - character[0].speed; 
 		BMovingTime = 10 - character[1].speed;
 
+		playtime = 1800;
 		SetTimer(hWnd, 1, 100, NULL);
 
 		for (int i = 0; i < 14; i++)
@@ -529,10 +530,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0 - (bubble[pop_bubble].len - blocking_T[pop_bubble]), bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0};		// Top
 					box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 + (bubble[pop_bubble].len - blocking_B[pop_bubble])};		// Bottom
 
-					if (collision(CharA, B_1) == 1 || collision(CharA, B_2) == 1 || collision(CharA, B_3) == 1 || collision(CharA, B_4) == 1 || collision(CharA, B_5) == 1)
-						character[0].state = 1;
-					if (collision(CharB, B_1) == 1 || collision(CharB, B_2) == 1 || collision(CharB, B_3) == 1 || collision(CharB, B_4) == 1 || collision(CharB, B_5) == 1)
- 						character[1].state = 1;
+					if (collision(CharA, B_1) == 1 || collision(CharA, B_2) == 1 || collision(CharA, B_3) == 1 || collision(CharA, B_4) == 1 || collision(CharA, B_5) == 1) {
+						character[0].state = 1; ++Bscore;
+					}
+					if (collision(CharB, B_1) == 1 || collision(CharB, B_2) == 1 || collision(CharB, B_3) == 1 || collision(CharB, B_4) == 1 || collision(CharB, B_5) == 1) {
+						character[1].state = 1; ++Ascore;
+					}
 
 					InvalidateRect(hWnd, NULL, TRUE);
 				}
@@ -613,6 +616,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				character[1].state = 0; Bdead_time = 0;
 				character[1].x = StartBX; character[1].y = StartBY;
 			}
+		}
+
+		
+		if (--playtime == 0) {
+			if (Ascore > Bscore)
+				MessageBox(hWnd, L"Player 1 WIN", L"GameResult", MB_OK);
+			if (Ascore < Bscore)
+				MessageBox(hWnd, L"Player 2 WIN", L"GameResult", MB_OK);
+			if (Ascore == Bscore)
+				MessageBox(hWnd, L"DRAW", L"GameResult", MB_OK);
 		}
 	}
 		InvalidateRect(hWnd, NULL, FALSE);
@@ -1049,7 +1062,6 @@ BOOL CALLBACK Dlalog_Proc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			break;
 
 		case IDOK:
-			//MessageBox(hDlg, L"test", L"test, ", MB_OK);
 			EndDialog(hDlg, 0);
 			break;
 		case IDCANCEL:

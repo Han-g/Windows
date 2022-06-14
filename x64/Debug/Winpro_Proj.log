@@ -6,10 +6,10 @@ E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows
 E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(87,131): warning C4024: 'SetWindowPos': 형식 및 실제 매개 변수 7의 형식이 서로 다릅니다.
 E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(96,16): warning C4244: 'return': 'WPARAM'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(135,3): warning C4133: '함수': 'BOOL (__cdecl *)(HWND,UINT,WPARAM,LPARAM)'과(와) 'DLGPROC' 사이의 형식이 호환되지 않습니다.
-E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(983,29): warning C4047: '함수': 'DWORD'의 간접 참조 수준이 'void *'과(와) 다릅니다.
-E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(983,25): warning C4024: 'PlaySoundW': 형식 및 실제 매개 변수 3의 형식이 서로 다릅니다.
+E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(996,29): warning C4047: '함수': 'DWORD'의 간접 참조 수준이 'void *'과(와) 다릅니다.
+E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(996,25): warning C4024: 'PlaySoundW': 형식 및 실제 매개 변수 3의 형식이 서로 다릅니다.
 E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(121,17): warning C4101: 'oldBrush' :참조되지 않은 지역 변수입니다.
 E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(121,9): warning C4101: 'hBrush' :참조되지 않은 지역 변수입니다.
-E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(997,8): warning C4101: 'state' :참조되지 않은 지역 변수입니다.
-E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(996,7): warning C4101: 'str' :참조되지 않은 지역 변수입니다.
+E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(1010,8): warning C4101: 'state' :참조되지 않은 지역 변수입니다.
+E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\main.c(1009,7): warning C4101: 'str' :참조되지 않은 지역 변수입니다.
   Winpro_Proj.vcxproj -> E:\강의자료\OneDrive - 한국산업기술대학교\4학기\Team_Proj\Windows\x64\Debug\Winpro_Proj.exe
