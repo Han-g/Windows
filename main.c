@@ -119,8 +119,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	HBRUSH hBrush, oldBrush;
 	static HBITMAP hBit1, hBit2, hBit3, bgBit1, bgBit2, bgBit3, itemBit;
 	//HBITMAP oldBit1, oldBit2;
-	static int bubble_num[2] = { 1,1 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0;
-	static int x = 0, y = 0, w = 330, h = 240, mx = 0, my = 0, mw = 1600, mh = 1200;
+	static int bubble_num[2] = { 0,0 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0;
+	static int x = 0, y = 0, StartAX = 0, StartAY = 0, StartBX = 0, StartBY = 0, Adead_time = 0, Bdead_time = 0;
 	static Character character[2];
 	static Bubble bubble[14];
 	static Object obj[13][15];
@@ -173,8 +173,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				obj[6][14].kind = 3; obj[7][14].kind = 3; obj[8][14].kind = 3; obj[9][14].kind = 3; obj[10][14].kind = 3;
 			}
 
-			character[0].x = 1; character[0].y = 11;
-			character[1].x = 10; character[1].y = 3;
+			StartAX = 1, StartAY = 11, StartBX = 10, StartBY = 3;
+			character[0].x = StartAX; character[0].y = StartAY;
+			character[1].x = StartBX; character[1].y = StartBY;
 
 			break;
 		case 2:		// village10
@@ -209,8 +210,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				obj[11][5].kind = 6; obj[11][9].kind = 6; obj[9][5].kind = 6; obj[9][9].kind = 6; obj[7][9].kind = 6;
 			}
 
-			character[0].x = 1; character[0].y = 2;
-			character[1].x = 13; character[1].y = 1;
+			StartAX = 1, StartAY = 2, StartBX = 13, StartBY = 1;
+			character[0].x = StartAX; character[0].y = StartAY;
+			character[1].x = StartBX; character[1].y = StartBY;
 
 			break;
 		case 3:		// patrit14
@@ -245,8 +247,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				obj[1][1].kind = 3; obj[1][13].kind = 3; obj[11][1].kind = 3; obj[11][13].kind = 3;
 			}
 
-			character[0].x = 2; character[0].y = 12;
-			character[1].x = 12; character[1].y = 12;
+			StartAX = 2, StartAY = 12, StartBX = 12, StartBY = 12;
+			character[0].x = StartAX; character[0].y = StartAY;
+			character[1].x = StartBX; character[1].y = StartBY;
 
 			break;
 		default:
@@ -424,13 +427,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 	{
 		int pop_bubble = 0;
+		box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
+		box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
 
-		for (int i = 0; i < 14; i++)
+		for (int i = 0; i < 14; i++) // bubble setting
 		{
 			if (bubble[i].pop == 1) {
 				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
 				bubble[i].pop = 0;
-				pop_bubble = i;
 				InvalidateRect(hWnd, NULL, TRUE);
 			}
 			if (bubble[i].on == 1) {
@@ -438,18 +442,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				bubble[i].time = (bubble[i].time + 1);
 				Bubble_move = (Bubble_move + 1) % 4;
 				if (bubble[i].time % 20 == 0) {
-					if (i < 6) count1 -= 1;
-					else count2 -= 1;
-					bubble[i].on = 0; bubble[i].pop = 1; bubble[i].time = 0;
+					if (i < 6) { count1 -= 1; bubble_num[0] -= 1; }
+					else { count2 -= 1; bubble_num[1] -= 1; }
+					
+					pop_bubble = i; bubble[i].on = 0; bubble[i].pop = 1; bubble[i].time = 0;
 
 					//collision
-					box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
-					box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
-					box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };
-					box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 2, bubble[pop_bubble].y + 1 };
-					box B_3 = { bubble[pop_bubble].x - 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };
-					box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 2 };
-					box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y - 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0 };
+					box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };							// Center
+					box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1 + bubble[pop_bubble].len, bubble[pop_bubble].y + 1 };	// Right
+					box B_3 = { bubble[pop_bubble].x - bubble[pop_bubble].len, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };		// Left
+					box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 + bubble[pop_bubble].len };	// Top
+					box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y - bubble[pop_bubble].len, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0 };		// Bottom
 
 					if (collision(CharA, B_1) == 1 || collision(CharA, B_2) == 1 || collision(CharA, B_3) == 1 || collision(CharA, B_4) == 1 || collision(CharA, B_5) == 1)
 						character[0].state = 1;
@@ -457,6 +460,82 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						character[1].state = 1;
 					InvalidateRect(hWnd, NULL, TRUE);
 				}
+			}
+		}
+
+		for (int y = 0; y < 14; y++) // item setting
+			for (int x = 0; x < 12; x++) {
+				if (item[y][x].on == 1) {
+					box ITEM = { x,y,x + 1,y + 1 };
+					if (collision(CharA, ITEM) == 1) {
+						switch (item[y][x].kind)
+						{
+						case 0:
+							//character[0].speed = (character[0].speed + 1) % 4;
+							item[y][x].on = 0;
+							break;
+						case 1:
+							if (character[0].bubble_len < 5)
+								character[0].bubble_len = (character[0].bubble_len + 1);
+							item[y][x].on = 0;
+							break;
+						case 2:
+							if (character[0].num_bubble < 8)
+								character[0].num_bubble = (character[0].num_bubble + 1);
+							item[y][x].on = 0;
+							break;
+						case 3:
+							character[0].bubble_len = 8;
+							item[y][x].on = 0;
+							break;
+						case 4:
+							item[y][x].on = 0;
+							break;
+						default:
+							break;
+						}
+					}
+					else if (collision(CharB, ITEM) == 1) {
+						switch (item[y][x].kind)
+						{
+						case 0:
+							//character[1].speed = (character[0].speed + 1) % 4;
+							item[y][x].on = 0;
+							break;
+						case 1:
+							if (character[1].bubble_len < 5)
+								character[1].bubble_len = (character[0].bubble_len + 1);
+							item[y][x].on = 0;
+							break;
+						case 2:
+							if (character[1].num_bubble < 8)
+								character[1].num_bubble = (character[1].num_bubble + 1);
+							item[y][x].on = 0;
+							break;
+						case 3:
+							character[1].bubble_len = 8;
+							item[y][x].on = 0;
+							break;
+						case 4:
+							item[y][x].on = 0;
+							break;
+						default:
+							break;
+						}
+					}
+				}
+			}
+		
+		if (character[0].state == 1) {
+			if (++Adead_time % 30 == 0) {
+				character[0].state = 0; Adead_time = 0;
+				character[0].x = StartAX; character[0].y = StartAY;
+			}
+		}
+		if (character[1].state == 1) {
+			if (++Bdead_time % 30 == 0) {
+				character[1].state = 0; Bdead_time = 0;
+				character[1].x = StartBX; character[1].y = StartBY;
 			}
 		}
 	}
@@ -535,24 +614,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case 'f':
 		case 'F':
-			if (bubble_num[0] > count1 && character[0].state == 0) {
+			if (character[0].num_bubble > count1 && character[0].state == 0 && bubble_num[0] < character[0].num_bubble) {
 				bubble[count1].x = character[0].x; bubble[count1].y = character[0].y;
-				bubble[count1].time = 0; bubble[count1].on = 1;
-				count1 = (count1 + 1) % (character[0].num_bubble+1);
+				bubble[count1].time = 0; bubble[count1].on = 1; bubble[count1].len = character[0].bubble_len;
+				count1++;// = (count1 + 1) % (character[0].num_bubble);
+				bubble_num[0]++;// += 1;
 			}
 			break;
 		case 0x60:
-			if (bubble_num[1] > count2 && character[1].state == 0) {
+			if (character[1].num_bubble > count2 && character[1].state == 0 && bubble_num[1] < character[1].num_bubble) {
 				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
-				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
-				count2 = (count2 + 1) % (character[1].num_bubble+1);
-			}
-			break;
-		case VK_SHIFT:
-			if (bubble_num[1] > count2 && character[1].state == 0) {
-				bubble[6 + count2].x = character[1].x; bubble[6 + count2].y = character[1].y;
-				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1;
-				count2 = (count2 + 1) % (character[1].num_bubble + 1);
+				bubble[6 + count2].time = 0; bubble[6 + count2].on = 1; bubble[6 + count2].len = character[1].bubble_len;
+				count2++;// = (count2 + 1) % (character[1].num_bubble);
+				bubble_num[1]++;// += 1;
 			}
 			break;
 
@@ -564,7 +638,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		default:
 			break;
 		}
-		InvalidateRect(hWnd, NULL, TRUE);
+		InvalidateRect(hWnd, NULL, FALSE);
 		break;
 	case WM_KEYUP:
 		movementA = 1; movementB = 1;
@@ -625,14 +699,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
-		for (int i = 0; i < bubble_num[0]; i++)
+		for (int y = 0; y < 12; y++)
+			for (int x = 0; x < 14; x++)
+				if (item[y][x].on == 1 && item[y][x].kind < 6) {
+					SelectObject(memdc, itemBit);
+					StretchBlt(hdc, x * 50, y * 50, 50, 50, memdc, 40 * item[y][x].kind, 0, 40, 50, SRCCOPY);
+				}
+
+
+		for (int i = 0; i < character[0].num_bubble; i++)
 		{
 			if (bubble[i].on == 1) {
 				SelectObject(memdc, hBit3);
 				StretchBlt(hdc, bubble[i].x * 50, bubble[i].y * 50, 50, 50, memdc, 37 * Bubble_move, 0, 37, 50, SRCCOPY);
 			}
 		}
-		for (int i = 0; i < bubble_num[1]; i++)
+		for (int i = 0; i < character[1].num_bubble; i++)
 		{
 			if (bubble[6 + i].on == 1) {
 				SelectObject(memdc, hBit3);
@@ -641,7 +723,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		hBrush = CreateSolidBrush(RGB(0, 0, 255));
 		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
-		for (int i = 0; i < bubble_num[0]; i++)
+		for (int i = 0; i < character[0].num_bubble; i++)
 		{
 			if (bubble[i].pop == 1)
 			{
@@ -656,8 +738,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[i].y][bubble[i].x + 1].kind == 2) {
 					obj[bubble[i].y][bubble[i].x + 1].kind = 1;
-					item[bubble[i].y][bubble[i].x + 1].kind = rand() % 6;
-					item[bubble[i].y][bubble[i].x + 1].on = 1;
+					item[bubble[i].y][bubble[i].x + 1].kind = (rand() % 51) / 10;
+					if (item[bubble[i].y][bubble[i].x + 1].kind != 5)
+						item[bubble[i].y][bubble[i].x + 1].on = 1;
 				}
 
 				if (obj[bubble[i].y][bubble[i].x-1].kind == 1) {
@@ -667,8 +750,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[i].y][bubble[i].x - 1].kind == 2) {
 					obj[bubble[i].y][bubble[i].x - 1].kind = 1;
-					item[bubble[i].y][bubble[i].x - 1].kind = rand() % 6;
-					item[bubble[i].y][bubble[i].x - 1].on = 1;
+					item[bubble[i].y][bubble[i].x - 1].kind = (rand() % 51) / 10;
+					if (item[bubble[i].y][bubble[i].x - 1].kind != 5)
+						item[bubble[i].y][bubble[i].x - 1].on = 1;
 				}
 
 				if (obj[bubble[i].y+1][bubble[i].x].kind == 1) {
@@ -678,8 +762,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[i].y + 1][bubble[i].x].kind == 2) {
 					obj[bubble[i].y + 1][bubble[i].x].kind = 1;
-					item[bubble[i].y + 1][bubble[i].x].kind = rand() % 6;
-					item[bubble[i].y + 1][bubble[i].x].on = 1;
+					item[bubble[i].y + 1][bubble[i].x].kind = (rand() % 51) / 10;
+					if (item[bubble[i].y + 1][bubble[i].x].kind != 5)
+						item[bubble[i].y + 1][bubble[i].x].on = 1;
 				}
 
 				if (obj[bubble[i].y-1][bubble[i].x].kind == 1) {
@@ -689,12 +774,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[i].y - 1][bubble[i].x].kind == 2) {
 					obj[bubble[i].y - 1][bubble[i].x].kind = 1;
-					item[bubble[i].y - 1][bubble[i].x].kind = rand() % 6;
-					item[bubble[i].y - 1][bubble[i].x].on = 1;
+					item[bubble[i].y - 1][bubble[i].x].kind = (rand() % 51) / 10;
+					if (item[bubble[i].y - 1][bubble[i].x].kind != 5)
+						item[bubble[i].y - 1][bubble[i].x].on = 1;
 				}
 			}
 		}
-		for (int i = 0; i < bubble_num[1]; i++)
+		for (int i = 0; i < character[1].num_bubble; i++)
 		{
 			if (bubble[6 + i].pop == 1)
 			{
@@ -709,8 +795,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[6 + i].y][bubble[6 + i].x + 1].kind == 2) {
 					obj[bubble[6 + i].y][bubble[6 + i].x + 1].kind = 1;
-					item[bubble[6 + i].y][bubble[6 + i].x + 1].kind = rand() % 6;
-					item[bubble[6 + i].y][bubble[6 + i].x + 1].on = 1;
+					item[bubble[6 + i].y][bubble[6 + i].x + 1].kind = (rand() % 51) / 10;
+					if (item[bubble[6 + i].y][bubble[6 + i].x + 1].kind != 5)
+						item[bubble[6 + i].y][bubble[6 + i].x + 1].on = 1;
 				}
 
 				if (obj[bubble[6+i].y][bubble[6+i].x-1].kind == 1) {
@@ -720,8 +807,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[6 + i].y][bubble[6 + i].x - 1].kind == 2) {
 					obj[bubble[6 + i].y][bubble[6 + i].x - 1].kind = 1;
-					item[bubble[6 + i].y][bubble[6 + i].x - 1].kind = rand() % 6;
-					item[bubble[6 + i].y][bubble[6 + i].x - 1].on = 1;
+					item[bubble[6 + i].y][bubble[6 + i].x - 1].kind = (rand() % 51) / 10;
+					if (item[bubble[6 + i].y][bubble[6 + i].x - 1].kind != 5)
+						item[bubble[6 + i].y][bubble[6 + i].x - 1].on = 1;
 				}
 
 				if (obj[bubble[6+i].y+1][bubble[6+i].x].kind == 1) {
@@ -731,8 +819,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[6 + i].y + 1][bubble[6 + i].x].kind == 2) {
 					obj[bubble[6 + i].y + 1][bubble[6 + i].x].kind = 1;
-					item[bubble[6 + i].y + 1][bubble[6 + i].x].kind = rand() % 6;
-					item[bubble[6 + i].y + 1][bubble[6 + i].x].on = 1;
+					item[bubble[6 + i].y + 1][bubble[6 + i].x].kind = (rand() % 51) / 10;
+					if (item[bubble[6 + i].y + 1][bubble[6 + i].x].kind != 5)
+						item[bubble[6 + i].y + 1][bubble[6 + i].x].on = 1;
 				}
 
 				if (obj[bubble[6+i].y-1][bubble[6+i].x].kind == 1) {
@@ -742,18 +831,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 				else if (obj[bubble[6 + i].y - 1][bubble[6 + i].x].kind == 2) {
 					obj[bubble[6 + i].y - 1][bubble[6 + i].x].kind = 1;	
-					item[bubble[6 + i].y - 1][bubble[6 + i].x].kind = rand() % 6;
-					item[bubble[6 + i].y - 1][bubble[6 + i].x].on = 1;
+					item[bubble[6 + i].y - 1][bubble[6 + i].x].kind = (rand() % 51) / 10;
+					if (item[bubble[6 + i].y - 1][bubble[6 + i].x].kind != 5)
+						item[bubble[6 + i].y - 1][bubble[6 + i].x].on = 1;
 				}
 			}
 		}
-
-		for (int y = 0; y < 12; y++)
-			for (int x = 0; x < 14; x++)
-				if (item[y][x].on == 1 && item[y][x].kind < 6) {
-					SelectObject(memdc, itemBit);
-					StretchBlt(hdc, x * 50, y * 50, 50, 50, memdc, 40 * item[y][x].kind, 0, 40, 50, SRCCOPY);
-				}
 
 
 		if (character[0].state == 0) {
