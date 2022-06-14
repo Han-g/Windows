@@ -3,6 +3,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <windows.h>
+#include <mmsystem.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <tchar.h>
@@ -10,6 +11,7 @@
 #include <time.h>
 #include <math.h>
 #include "resource.h"
+#pragma comment(lib, "winmm.lib")
 
 typedef struct box {
 	int left, top, right, bottom;
@@ -20,13 +22,13 @@ int map_kind = 1, fst_char_kind = 1, sec_char_kind = 1;
 int collision(box A, box B);
 int collision(box A, box B)
 {
-	if (A.left <= B.left && A.right > B.left && A.top < B.bottom && A.top >= B.top) 
+	if (A.left >= B.left && A.left < B.right && A.top < B.bottom && A.bottom > B.top) // left
 		return 1;
-	if (A.left <= B.left && A.right > B.left && A.bottom > B.top && A.bottom <= B.bottom) 
+	if (A.right > B.left && A.right <= B.right && A.top < B.bottom && A.bottom > B.top) // right
 		return 1;
-	if (A.left > B.right && A.right <= B.right && A.top < B.bottom && A.top >= B.top) 
+	if (A.left < B.right && A.right > B.left && A.top < B.bottom && A.top >= B.top) // top
 		return 1;
-	if (A.left > B.right && A.right <= B.right && A.bottom > B.top && A.bottom <= B.bottom) 
+	if (A.left < B.right && A.right > B.left && A.bottom <= B.bottom && A.bottom > B.top) // bottom
 		return 1;
 	return 0;
 }
@@ -121,6 +123,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	//HBITMAP oldBit1, oldBit2;
 	static int bubble_num[2] = { 0,0 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0;
 	static int x = 0, y = 0, StartAX = 0, StartAY = 0, StartBX = 0, StartBY = 0, Adead_time = 0, Bdead_time = 0, AMovingTime = 30, BMovingTime = 30;
+	static int blocking_L[14], blocking_R[14], blocking_T[14], blocking_B[14];
 	static Character character[2];
 	static Bubble bubble[14];
 	static Object obj[13][15];
@@ -130,6 +133,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_CREATE:
 		DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, Dlalog_Proc);
+
+		PlaySound(TEXT("ca_bgm.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP | SND_NODEFAULT);
 
 		itemBit = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP19));
 
@@ -498,21 +503,36 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					pop_bubble = i; bubble[i].on = 0; bubble[i].pop = 1; bubble[i].time = 0;
 
 					//collision
-					for (int l = 0; l < bubble[pop_bubble].len; l++) {
+					for (int l = 0; l <= bubble[pop_bubble].len; l++) {
 						if (obj[bubble[pop_bubble].y][bubble[pop_bubble].x + l].kind != 1) {
-							int col_block = l;
+							blocking_R[pop_bubble] = bubble[pop_bubble].len - l; break;
+						}
+					}
+					for (int l = 0; l <= bubble[pop_bubble].len; l++) {
+						if (obj[bubble[pop_bubble].y][bubble[pop_bubble].x - l].kind != 1) {
+							blocking_L[pop_bubble] = bubble[pop_bubble].len - l; break;
+						}
+					}
+					for (int l = 0; l <= bubble[pop_bubble].len; l++) {
+						if (obj[bubble[pop_bubble].y + l][bubble[pop_bubble].x].kind != 1) {
+							blocking_B[pop_bubble] = bubble[pop_bubble].len - l; break;
+						}
+					}
+					for (int l = 0; l <= bubble[pop_bubble].len; l++) {
+						if (obj[bubble[pop_bubble].y - l][bubble[pop_bubble].x].kind != 1) {
+							blocking_T[pop_bubble] = bubble[pop_bubble].len - l; break;
 						}
 					}
 					box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };							// Center
-					box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1 + bubble[pop_bubble].len, bubble[pop_bubble].y + 1 };	// Right
-					box B_3 = { bubble[pop_bubble].x - bubble[pop_bubble].len, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };		// Left
-					box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 + bubble[pop_bubble].len };	// Top
-					box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y - bubble[pop_bubble].len, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0 };		// Bottom
+					box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1 + (bubble[pop_bubble].len - blocking_R[pop_bubble]), bubble[pop_bubble].y + 1};		// Right
+					box B_3 = { bubble[pop_bubble].x + 0 - (bubble[pop_bubble].len - blocking_L[pop_bubble]), bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1};		// Left
+					box B_4 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0 - (bubble[pop_bubble].len - blocking_T[pop_bubble]), bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0};		// Top
+					box B_5 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 + (bubble[pop_bubble].len - blocking_B[pop_bubble])};		// Bottom
 
 					if (collision(CharA, B_1) == 1 || collision(CharA, B_2) == 1 || collision(CharA, B_3) == 1 || collision(CharA, B_4) == 1 || collision(CharA, B_5) == 1)
 						character[0].state = 1;
 					if (collision(CharB, B_1) == 1 || collision(CharB, B_2) == 1 || collision(CharB, B_3) == 1 || collision(CharB, B_4) == 1 || collision(CharB, B_5) == 1)
-						character[1].state = 1;
+ 						character[1].state = 1;
 
 					InvalidateRect(hWnd, NULL, TRUE);
 				}
@@ -606,7 +626,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		case 'a':
 		case 'A':
-			if ((character[0].x) * 50 > 0 && (character[0].y != character[1].y || character[0].x - character[0].speed != character[1].x)) {
+			if ((character[0].x) * 50 > 0) {
 				if (obj[character[0].y][character[0].x - 1].kind == 1) {
 					//character[0].x -= 1;// character[0].speed;
 					character[0].diff = 3;
@@ -616,7 +636,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		case 'D':
 		case 'd':
-			if ((character[0].x + 1) * 50 < window_size_w && (character[0].x + character[0].speed != character[1].x || character[0].y != character[1].y)) {
+			if ((character[0].x + 1) * 50 < window_size_w) {
 				if (obj[character[0].y][character[0].x + 1].kind == 1) {
 					//character[0].x += 1;//character[0].speed; 
 					character[0].diff = 4;
@@ -626,59 +646,53 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		case 'W':
 		case 'w':
-			if ((character[0].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y - character[0].speed != character[1].y)) {
+			if ((character[0].y) * 50 > 0) {
 				if (obj[character[0].y - 1][character[0].x].kind == 1) {
-					//character[0].y -= 1;// character[0].speed;
 					character[0].diff = 1;
-					movementA = 1; //AMovingTime = 30 - character[0].speed;
+					movementA = 1;
 				}
 			}
 			break;
 		case 'S':
 		case 's':
-			if ((character[0].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y + character[0].speed != character[1].y)) {
+			if ((character[0].y + 1) * 50 < window_size_d) {
 				if (obj[character[0].y + 1][character[0].x].kind == 1) {
-					//character[0].y += 1;// character[0].speed;
 					character[0].diff = 2;
-					movementA = 1; //AMovingTime = 30 - character[0].speed;
+					movementA = 1;
 				}
 			}
 			break;
 
 
 		case VK_RIGHT:
-			if ((character[1].x + 1) * 50 < window_size_w && (character[0].x != character[1].x + character[1].speed || character[0].y != character[1].y)) {
+			if ((character[1].x + 1) * 50 < window_size_w) {
 				if (obj[character[1].y][character[1].x + 1].kind == 1) {
-					//character[1].x += 1;// character[1].speed;
 					character[1].diff = 4;
-					movementB = 1; //BMovingTime = 10 - character[1].speed;
+					movementB = 1;
 				}
 			}
 			break;
 		case VK_UP:
-			if ((character[1].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y != character[1].y - character[1].speed)) {
+			if ((character[1].y) * 50 > 0) {
 				if (obj[character[1].y - 1][character[1].x].kind == 1) {
-					//character[1].y -= 1;//character[1].speed; 
 					character[1].diff = 1;
-					movementB = 1; //BMovingTime = 10 - character[1].speed;
+					movementB = 1;
 				}
 			}
 			break;
 		case VK_DOWN:
-			if ((character[1].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y != character[1].y + character[1].speed)) {
+			if ((character[1].y + 1) * 50 < window_size_d) {
 				if (obj[character[1].y + 1][character[1].x].kind == 1) {
-					//character[1].y += 1;// character[1].speed;
 					character[1].diff = 2;
-					movementB = 1; //BMovingTime = 10 - character[1].speed;
+					movementB = 1;
 				}
 			}
 			break;
 		case VK_LEFT:
-			if ((character[1].x) * 50 > 0 && (character[0].x != character[1].x - character[1].speed || character[0].y != character[1].y)) {
+			if ((character[1].x) * 50 > 0) {
 				if (obj[character[1].y][character[1].x - 1].kind == 1) {
-					//character[1].x -= 1;// character[1].speed;
 					character[1].diff = 3;
-					movementB = 1; //BMovingTime = 10 - character[1].speed;
+					movementB = 1;
 				}
 			}
 			break;
@@ -796,8 +810,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				StretchBlt(hdc, bubble[6 + i].x * 50, bubble[6 + i].y * 50, 50, 50, memdc, 37 * Bubble_move, 0, 37, 50, SRCCOPY);
 			}
 		}
-		hBrush = CreateSolidBrush(RGB(0, 0, 255));
-		oldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+
+		for (int i = 0; i < 14; i++) {
+			if (bubble[i].pop == 1) {
+				for (int l = 0; l <= bubble[i].len; l++) {
+					if (obj[bubble[i].y][bubble[i].x + l].kind != 1) {
+						blocking_R[i] = bubble[i].len - l; break;
+					}
+				}
+				for (int l = 0; l <= bubble[i].len; l++) {
+					if (obj[bubble[i].y][bubble[i].x - l].kind != 1) {
+						blocking_L[i] = bubble[i].len - l; break;
+					}
+				}
+				for (int l = 0; l <= bubble[i].len; l++) {
+					if (obj[bubble[i].y + l][bubble[i].x].kind != 1) {
+						blocking_B[i] = bubble[i].len - l; break;
+					}
+				}
+				for (int l = 0; l <= bubble[i].len; l++) {
+					if (obj[bubble[i].y - l][bubble[i].x].kind != 1) {
+						blocking_T[i] = bubble[i].len - l; break;
+					}
+				}
+			}
+		}
+
 		for (int i = 0; i < character[0].num_bubble; i++)
 		{
 			if (bubble[i].pop == 1)
@@ -805,11 +843,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
 				SelectObject(memdc, hBit3);
 				StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 0) * 50, 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
-
-				if (obj[bubble[i].y][bubble[i].x+1].kind == 1) {
+				//Right
+				if (obj[bubble[i].y][bubble[i].x + 1].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP8));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[i].x + 1) * 50, (bubble[i].y + 0) * 50, character[0].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[i].x + 1) * 50, (bubble[i].y + 0) * 50, (character[0].bubble_len-blocking_R[i]) * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_R[i] = 0;
 				}
 				else if (obj[bubble[i].y][bubble[i].x + 1].kind == 2) {
 					obj[bubble[i].y][bubble[i].x + 1].kind = 1;
@@ -817,11 +856,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (item[bubble[i].y][bubble[i].x + 1].kind != 5)
 						item[bubble[i].y][bubble[i].x + 1].on = 1;
 				}
-
-				if (obj[bubble[i].y][bubble[i].x-1].kind == 1) {
+				//Left
+				if (obj[bubble[i].y][bubble[i].x - 1].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[i].x - character[0].bubble_len) * 50, (bubble[i].y + 0) * 50, character[0].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[i].x - (character[0].bubble_len - blocking_L[i])) * 50, (bubble[i].y + 0) * 50, (character[0].bubble_len-blocking_L[i]) * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_L[i] = 0;
 				}
 				else if (obj[bubble[i].y][bubble[i].x - 1].kind == 2) {
 					obj[bubble[i].y][bubble[i].x - 1].kind = 1;
@@ -829,11 +869,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (item[bubble[i].y][bubble[i].x - 1].kind != 5)
 						item[bubble[i].y][bubble[i].x - 1].on = 1;
 				}
-
-				if (obj[bubble[i].y+1][bubble[i].x].kind == 1) {
+				//Top
+				if (obj[bubble[i].y + 1][bubble[i].x].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP10));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 1) * 50, 50, character[0].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y + 1) * 50, 50, (character[0].bubble_len-blocking_T[i]) * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_T[i] = 0;
 				}
 				else if (obj[bubble[i].y + 1][bubble[i].x].kind == 2) {
 					obj[bubble[i].y + 1][bubble[i].x].kind = 1;
@@ -841,11 +882,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (item[bubble[i].y + 1][bubble[i].x].kind != 5)
 						item[bubble[i].y + 1][bubble[i].x].on = 1;
 				}
-
-				if (obj[bubble[i].y-1][bubble[i].x].kind == 1) {
+				//Bottom
+				if (obj[bubble[i].y - 1][bubble[i].x].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP9));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y - character[0].bubble_len) * 50, 50, character[0].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y - (character[0].bubble_len - blocking_B[i])) * 50, 50, (character[0].bubble_len-blocking_B[i]) * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_B[i] = 0;
 				}
 				else if (obj[bubble[i].y - 1][bubble[i].x].kind == 2) {
 					obj[bubble[i].y - 1][bubble[i].x].kind = 1;
@@ -862,11 +904,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP6));
 				SelectObject(memdc, hBit3);
 				StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 0) * 50, 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
-
+				//Right
 				if (obj[bubble[6+i].y][bubble[6+i].x+1].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP8));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 0) * 50, character[1].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x + 1) * 50, (bubble[6 + i].y + 0) * 50, (character[1].bubble_len-blocking_R[6 + i]) * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_R[i] = 0;
 				}
 				else if (obj[bubble[6 + i].y][bubble[6 + i].x + 1].kind == 2) {
 					obj[bubble[6 + i].y][bubble[6 + i].x + 1].kind = 1;
@@ -874,11 +917,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (item[bubble[6 + i].y][bubble[6 + i].x + 1].kind != 5)
 						item[bubble[6 + i].y][bubble[6 + i].x + 1].on = 1;
 				}
-
+				//Left
 				if (obj[bubble[6+i].y][bubble[6+i].x-1].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x - character[1].bubble_len) * 50, (bubble[6 + i].y + 0) * 50, character[1].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x - (character[1].bubble_len - blocking_L[6 + i])) * 50, (bubble[6 + i].y + 0) * 50, (character[1].bubble_len-blocking_L[6 + i]-1) * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_L[i] = 0;
 				}
 				else if (obj[bubble[6 + i].y][bubble[6 + i].x - 1].kind == 2) {
 					obj[bubble[6 + i].y][bubble[6 + i].x - 1].kind = 1;
@@ -886,11 +930,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (item[bubble[6 + i].y][bubble[6 + i].x - 1].kind != 5)
 						item[bubble[6 + i].y][bubble[6 + i].x - 1].on = 1;
 				}
-
+				//Top
 				if (obj[bubble[6+i].y+1][bubble[6+i].x].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP10));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50, 50, character[1].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50, 50, (character[1].bubble_len-blocking_T[6 + i]+1) * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_T[i] = 0;
 				}
 				else if (obj[bubble[6 + i].y + 1][bubble[6 + i].x].kind == 2) {
 					obj[bubble[6 + i].y + 1][bubble[6 + i].x].kind = 1;
@@ -898,11 +943,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					if (item[bubble[6 + i].y + 1][bubble[6 + i].x].kind != 5)
 						item[bubble[6 + i].y + 1][bubble[6 + i].x].on = 1;
 				}
-
+				//Bottom
 				if (obj[bubble[6+i].y-1][bubble[6+i].x].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP9));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y - character[1].bubble_len) * 50, 50, character[1].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y - (character[1].bubble_len - blocking_B[6 + i])) * 50, 50, (character[1].bubble_len-blocking_B[6 + i]) * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					blocking_B[i] = 0;
 				}
 				else if (obj[bubble[6 + i].y - 1][bubble[6 + i].x].kind == 2) {
 					obj[bubble[6 + i].y - 1][bubble[6 + i].x].kind = 1;	
@@ -934,6 +980,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:
+		PlaySound(NULL, NULL, NULL);
 		DeleteObject(hBit1);
 		PostQuitMessage(0);
 		break;
