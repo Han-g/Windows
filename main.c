@@ -120,7 +120,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static HBITMAP hBit1, hBit2, hBit3, bgBit1, bgBit2, bgBit3, itemBit;
 	//HBITMAP oldBit1, oldBit2;
 	static int bubble_num[2] = { 0,0 }, count1 = 0, count2 = 0, movementA = 0, movementB = 0, Bubble_move = 0;
-	static int x = 0, y = 0, StartAX = 0, StartAY = 0, StartBX = 0, StartBY = 0, Adead_time = 0, Bdead_time = 0;
+	static int x = 0, y = 0, StartAX = 0, StartAY = 0, StartBX = 0, StartBY = 0, Adead_time = 0, Bdead_time = 0, AMovingTime = 30, BMovingTime = 30;
 	static Character character[2];
 	static Bubble bubble[14];
 	static Object obj[13][15];
@@ -130,9 +130,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_CREATE:
 		DialogBox(g_hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, Dlalog_Proc);
-		//hBit1 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP1));
-		//hBit2 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP1));
-		//hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP5));
+
 		itemBit = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP19));
 
 		character[0].x = 13; character[0].y = 11;
@@ -416,6 +414,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 
+		AMovingTime = 10 - character[0].speed; 
+		BMovingTime = 10 - character[1].speed;
+
 		SetTimer(hWnd, 1, 100, NULL);
 
 		for (int i = 0; i < 14; i++)
@@ -427,8 +428,57 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 	{
 		int pop_bubble = 0;
+
 		box CharA = { character[0].x, character[0].y, character[0].x + 1, character[0].y + 1 };
 		box CharB = { character[1].x, character[1].y, character[1].x + 1, character[1].y + 1 };
+
+		// characters move
+		if (AMovingTime != 0) --AMovingTime;
+		if (movementA == 1) {
+			if (AMovingTime == 0) {
+				switch (character[0].diff)
+				{
+				case 1:
+					character[0].y -= 1;
+					break;
+				case 2:
+					character[0].y += 1;
+					break;
+				case 3:
+					character[0].x -= 1;
+					break;
+				case 4:
+					character[0].x += 1;
+					break;
+				default:
+					break;
+				}
+				AMovingTime = 10 - character[0].speed;
+			}
+		}
+		if (BMovingTime != 0) --BMovingTime;
+		if (movementB == 1) {
+			if (BMovingTime == 0) {
+				switch (character[1].diff)
+				{
+				case 1:
+					character[1].y -= 1;
+					break;
+				case 2:
+					character[1].y += 1;
+					break;
+				case 3:
+					character[1].x -= 1;
+					break;
+				case 4:
+					character[1].x += 1;
+					break;
+				default:
+					break;
+				}
+				BMovingTime = 10 - character[1].speed;
+			}
+		}
 
 		for (int i = 0; i < 14; i++) // bubble setting
 		{
@@ -448,6 +498,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					pop_bubble = i; bubble[i].on = 0; bubble[i].pop = 1; bubble[i].time = 0;
 
 					//collision
+					for (int l = 0; l < bubble[pop_bubble].len; l++) {
+						if (obj[bubble[pop_bubble].y][bubble[pop_bubble].x + l].kind != 1) {
+							int col_block = l;
+						}
+					}
 					box B_1 = { bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 1 };							// Center
 					box B_2 = { bubble[pop_bubble].x + 1, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 1 + bubble[pop_bubble].len, bubble[pop_bubble].y + 1 };	// Right
 					box B_3 = { bubble[pop_bubble].x - bubble[pop_bubble].len, bubble[pop_bubble].y + 0, bubble[pop_bubble].x + 0, bubble[pop_bubble].y + 1 };		// Left
@@ -458,6 +513,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						character[0].state = 1;
 					if (collision(CharB, B_1) == 1 || collision(CharB, B_2) == 1 || collision(CharB, B_3) == 1 || collision(CharB, B_4) == 1 || collision(CharB, B_5) == 1)
 						character[1].state = 1;
+
 					InvalidateRect(hWnd, NULL, TRUE);
 				}
 			}
@@ -471,7 +527,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						switch (item[y][x].kind)
 						{
 						case 0:
-							//character[0].speed = (character[0].speed + 1) % 4;
+							if (character[0].speed < 8) character[0].speed = (character[0].speed + 2);
 							item[y][x].on = 0;
 							break;
 						case 1:
@@ -499,7 +555,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						switch (item[y][x].kind)
 						{
 						case 0:
-							//character[1].speed = (character[0].speed + 1) % 4;
+							if (character[1].speed < 8) character[1].speed = (character[0].speed + 2);
 							item[y][x].on = 0;
 							break;
 						case 1:
@@ -551,63 +607,79 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case 'a':
 		case 'A':
 			if ((character[0].x) * 50 > 0 && (character[0].y != character[1].y || character[0].x - character[0].speed != character[1].x)) {
-				if (obj[character[0].y][character[0].x-1].kind == 1)
-					character[0].x -= character[0].speed; character[0].diff = 3;
-				movementA = (movementA + 1) % 4;
+				if (obj[character[0].y][character[0].x - 1].kind == 1) {
+					//character[0].x -= 1;// character[0].speed;
+					character[0].diff = 3;
+					movementA = 1; //AMovingTime = 30 - character[0].speed;
+				}
 			}
 			break;
 		case 'D':
 		case 'd':
 			if ((character[0].x + 1) * 50 < window_size_w && (character[0].x + character[0].speed != character[1].x || character[0].y != character[1].y)) {
-				if (obj[character[0].y][character[0].x+1].kind == 1)
-					character[0].x += character[0].speed; character[0].diff = 4;
-				movementA = (movementA + 1) % 4;
+				if (obj[character[0].y][character[0].x + 1].kind == 1) {
+					//character[0].x += 1;//character[0].speed; 
+					character[0].diff = 4;
+					movementA = 1; //AMovingTime = 30 - character[0].speed;
+				}
 			}
 			break;
 		case 'W':
 		case 'w':
 			if ((character[0].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y - character[0].speed != character[1].y)) {
-				if (obj[character[0].y-1][character[0].x].kind == 1)
-					character[0].y -= character[0].speed; character[0].diff = 1;
-				movementA = (movementA + 1) % 4;
+				if (obj[character[0].y - 1][character[0].x].kind == 1) {
+					//character[0].y -= 1;// character[0].speed;
+					character[0].diff = 1;
+					movementA = 1; //AMovingTime = 30 - character[0].speed;
+				}
 			}
 			break;
 		case 'S':
 		case 's':
 			if ((character[0].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y + character[0].speed != character[1].y)) {
-				if (obj[character[0].y+1][character[0].x].kind == 1)
-					character[0].y += character[0].speed; character[0].diff = 2;
-				movementA = (movementA + 1) % 4;
+				if (obj[character[0].y + 1][character[0].x].kind == 1) {
+					//character[0].y += 1;// character[0].speed;
+					character[0].diff = 2;
+					movementA = 1; //AMovingTime = 30 - character[0].speed;
+				}
 			}
 			break;
 
 
 		case VK_RIGHT:
 			if ((character[1].x + 1) * 50 < window_size_w && (character[0].x != character[1].x + character[1].speed || character[0].y != character[1].y)) {
-				if (obj[character[1].y][character[1].x+1].kind == 1)
-					character[1].x += character[1].speed; character[1].diff = 4;
-				movementB = (movementB + 1) % 4;
+				if (obj[character[1].y][character[1].x + 1].kind == 1) {
+					//character[1].x += 1;// character[1].speed;
+					character[1].diff = 4;
+					movementB = 1; //BMovingTime = 10 - character[1].speed;
+				}
 			}
 			break;
 		case VK_UP:
 			if ((character[1].y) * 50 > 0 && (character[0].x != character[1].x || character[0].y != character[1].y - character[1].speed)) {
-				if (obj[character[1].y-1][character[1].x].kind == 1)
-					character[1].y -= character[1].speed; character[1].diff = 1;
-				movementB = (movementB + 1) % 4;
+				if (obj[character[1].y - 1][character[1].x].kind == 1) {
+					//character[1].y -= 1;//character[1].speed; 
+					character[1].diff = 1;
+					movementB = 1; //BMovingTime = 10 - character[1].speed;
+				}
 			}
 			break;
 		case VK_DOWN:
 			if ((character[1].y + 1) * 50 < window_size_d && (character[0].x != character[1].x || character[0].y != character[1].y + character[1].speed)) {
-				if (obj[character[1].y+1][character[1].x].kind == 1)
-					character[1].y += character[1].speed; character[1].diff = 2;
-				movementB = (movementB + 1) % 4;
+				if (obj[character[1].y + 1][character[1].x].kind == 1) {
+					//character[1].y += 1;// character[1].speed;
+					character[1].diff = 2;
+					movementB = 1; //BMovingTime = 10 - character[1].speed;
+				}
 			}
 			break;
 		case VK_LEFT:
 			if ((character[1].x) * 50 > 0 && (character[0].x != character[1].x - character[1].speed || character[0].y != character[1].y)) {
-				if (obj[character[1].y][character[1].x-1].kind == 1)
-					character[1].x -= character[1].speed; character[1].diff = 3;
-				movementB = (movementB + 1) % 4;
+				if (obj[character[1].y][character[1].x - 1].kind == 1) {
+					//character[1].x -= 1;// character[1].speed;
+					character[1].diff = 3;
+					movementB = 1; //BMovingTime = 10 - character[1].speed;
+				}
 			}
 			break;
 
@@ -641,7 +713,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
 	case WM_KEYUP:
-		movementA = 1; movementB = 1;
+		movementA = 0; movementB = 0;
+		AMovingTime = 0; BMovingTime = 0;
 		InvalidateRect(hWnd, NULL, FALSE);
 		break;
 	case WM_PAINT:
@@ -649,6 +722,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		memdc = CreateCompatibleDC(hdc);
 		SelectObject(memdc, hBit1);
 
+		// BG_DRAW
 		for(int y = 0; y < 13; y++)
 			for (int x = 0; x < 15; x++)
 			{
@@ -699,6 +773,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				}
 			}
 
+		// ITEM_DRAW
 		for (int y = 0; y < 12; y++)
 			for (int x = 0; x < 14; x++)
 				if (item[y][x].on == 1 && item[y][x].kind < 6) {
@@ -706,7 +781,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					StretchBlt(hdc, x * 50, y * 50, 50, 50, memdc, 40 * item[y][x].kind, 0, 40, 50, SRCCOPY);
 				}
 
-
+		// BUBBLE_DRAW
 		for (int i = 0; i < character[0].num_bubble; i++)
 		{
 			if (bubble[i].on == 1) {
@@ -746,7 +821,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (obj[bubble[i].y][bubble[i].x-1].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[i].x - 1) * 50, (bubble[i].y + 0) * 50, character[0].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[i].x - character[0].bubble_len) * 50, (bubble[i].y + 0) * 50, character[0].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 				}
 				else if (obj[bubble[i].y][bubble[i].x - 1].kind == 2) {
 					obj[bubble[i].y][bubble[i].x - 1].kind = 1;
@@ -770,7 +845,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (obj[bubble[i].y-1][bubble[i].x].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP9));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y - 1) * 50, 50, character[0].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[i].x + 0) * 50, (bubble[i].y - character[0].bubble_len) * 50, 50, character[0].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 				}
 				else if (obj[bubble[i].y - 1][bubble[i].x].kind == 2) {
 					obj[bubble[i].y - 1][bubble[i].x].kind = 1;
@@ -803,7 +878,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (obj[bubble[6+i].y][bubble[6+i].x-1].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x - 1) * 50, (bubble[6 + i].y + 0) * 50, character[1].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x - character[1].bubble_len) * 50, (bubble[6 + i].y + 0) * 50, character[1].bubble_len * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 				}
 				else if (obj[bubble[6 + i].y][bubble[6 + i].x - 1].kind == 2) {
 					obj[bubble[6 + i].y][bubble[6 + i].x - 1].kind = 1;
@@ -827,7 +902,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (obj[bubble[6+i].y-1][bubble[6+i].x].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP9));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y - 1) * 50, 50, character[1].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y - character[1].bubble_len) * 50, 50, character[1].bubble_len * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 				}
 				else if (obj[bubble[6 + i].y - 1][bubble[6 + i].x].kind == 2) {
 					obj[bubble[6 + i].y - 1][bubble[6 + i].x].kind = 1;	
@@ -838,15 +913,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 
-
+		// CHARACTER_DRAW
 		if (character[0].state == 0) {
 			SelectObject(memdc, hBit1);
-			StretchBlt(hdc, character[0].x * 50, character[0].y * 50, 50, 50, memdc, 50 * movementA, 60 * character[0].diff, 50, 60, SRCCOPY);
+			StretchBlt(hdc, (character[0].x * 50), character[0].y * 50, 50, 50, memdc, 50 * (AMovingTime % 4), 60 * character[0].diff, 50, 60, SRCCOPY); 
+			//if (movementA == 1) {
+			//	//AMovingTime = 30 - character[0].speed;
+			//}
 		}
 
 		if (character[1].state == 0) {
 			SelectObject(memdc, hBit2);
-			StretchBlt(hdc, character[1].x * 50, character[1].y * 50, 50, 50, memdc, 50 * movementB, 60 * character[1].diff, 50, 60, SRCCOPY);
+			StretchBlt(hdc, (character[1].x * 50), character[1].y * 50, 50, 50, memdc, 50 * (BMovingTime % 4), 60 * character[1].diff, 50, 60, SRCCOPY); 
+			//if (movementB == 1) {
+			//	//BMovingTime = 10 - character[1].speed;
+			//}
 		}
 
 		DeleteDC(memdc);
