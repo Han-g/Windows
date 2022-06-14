@@ -934,7 +934,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (obj[bubble[6+i].y][bubble[6+i].x-1].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP7));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x - (character[1].bubble_len - blocking_L[6 + i])) * 50, (bubble[6 + i].y + 0) * 50, (character[1].bubble_len-blocking_L[6 + i]-1) * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x - (character[1].bubble_len - blocking_L[6 + i])) * 50, (bubble[6 + i].y + 0) * 50, (character[1].bubble_len-blocking_L[6 + i]) * 50, 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 					blocking_L[i] = 0;
 				}
 				else if (obj[bubble[6 + i].y][bubble[6 + i].x - 1].kind == 2) {
@@ -947,7 +947,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				if (obj[bubble[6+i].y+1][bubble[6+i].x].kind == 1) {
 					hBit3 = (HBITMAP)LoadBitmap(g_hInst, MAKEINTRESOURCE(IDB_BITMAP10));
 					SelectObject(memdc, hBit3);
-					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50, 50, (character[1].bubble_len-blocking_T[6 + i]+1) * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
+					StretchBlt(hdc, (bubble[6 + i].x + 0) * 50, (bubble[6 + i].y + 1) * 50, 50, (character[1].bubble_len-blocking_T[6 + i]) * 50, memdc, 40 * Bubble_move, 0, 40, 40, SRCCOPY);
 					blocking_T[i] = 0;
 				}
 				else if (obj[bubble[6 + i].y + 1][bubble[6 + i].x].kind == 2) {
